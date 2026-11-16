@@ -1,0 +1,41 @@
+# Marsadia Build Workflow — the automatic checks.
+# A skeleton: replace each <command> with the project's own, and delete what does not apply.
+# Two jobs, so the branch rule on the main line can require both by name.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    # Lint, typecheck, unit tests and the build.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # - uses: actions/setup-node@v4   # or the setup step of the project's own language
+      #   with: { node-version: 22, cache: npm }
+      # - run: <install>      # e.g. npm ci
+      # - run: <lint>         # e.g. npm run lint
+      # - run: <typecheck>    # e.g. npm run typecheck
+      # - run: <unit tests>   # e.g. npm test
+      # - run: <build>        # e.g. npm run build
+      - run: echo "Replace this step with the project's own checks."
+
+  isolation:
+    # The suite that proves the non-negotiable rules (for example: one customer cannot read
+    # another's data). Run it on a disposable database started inside the job, so a pull request
+    # never receives a secret of the hosted environment.
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      # - run: <start a disposable database and apply every migration>
+      # - run: <isolation suite>
+      - run: echo "Replace this step with the project's own isolation suite."

@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '===== WHERE THE WORK STANDS ====='; cat docs/STATE.md 2>/dev/null || echo '(docs/STATE.md not found)'; echo; echo '===== BRANCH ====='; git branch --show-current 2>/dev/null; echo; echo '===== LAST 10 COMMITS ====='; git log --oneline -10 2>/dev/null; echo; echo '===== UNCOMMITTED ====='; git status --short 2>/dev/null; echo; echo 'Read docs/STATE.md above before acting. Do not ask the owner to re-explain the project.'"
+          }
+        ]
+      }
+    ]
+  }
+}

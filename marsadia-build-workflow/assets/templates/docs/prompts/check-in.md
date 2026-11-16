@@ -1,0 +1,40 @@
+# The check-in — the advisor chat's own reminder
+
+While a build session runs, the advisor chat sets itself a one-off reminder (every 30 to 60
+minutes) that arrives back in the same chat. Each reminder carries the state forward, because the
+chat should act on what it last saw, not on a schedule. Rewrite the first paragraph at every
+check-in; keep the rules.
+
+---
+
+```
+Check-in for <project name> (no-delays rule; <30|60>-minute rhythm while a session runs).
+
+STATE AT <time>: <which session is running, on which model, started when, its time cap; the last
+commit seen; the checks; any job in progress; the last review seen; what I have already told the
+owner; what I owe him.>
+
+NOW: read GitHub — the commits of the slice's branch since <commit>, the checks on the head, the
+jobs in progress, the pull request's comments and reviews since <time> — then docs/STATE.md on the
+branch: "Chained sessions", "Needs the owner", "For the owner".
+
+RULES
+(a) Marker OPEN and the last push under 60 minutes old → alive: wait, tell the owner nothing, set
+    the next check-in.
+(b) Marker OPEN and no push for over 60 minutes → tell the owner and ask him to look at the
+    session before anything is fired.
+(c) Marker CLEAR, phases left, no hold → fire the next session at once, with any ruling as its
+    extra message; then CHECK WITHIN FIVE MINUTES that a marker commit appeared.
+(d) `phase: awaiting …` → do not fire. Do the review or the check myself (spec and plan against
+    the brief; the arithmetic; each built screen against the owner's drawing). Then fire with the
+    release, or with the precise list of what differs.
+(e) New findings → read them verbatim and check the class. Serious and Major are mine. Minors go
+    to the owner as a short plain-words list. A finding whose fix changes how a user works goes
+    to him with an example, options, a recommendation and what happens if deferred.
+(f) A question under "Needs the owner" → bring it to him the same way; write his answer into the
+    chain task's prompt.
+(g) `slice-state: ready-for-acceptance` → tell the owner and offer the sitting.
+
+Tell the owner only what changed or what needs his decision. Then set the next check-in, carrying
+this state forward.
+```
