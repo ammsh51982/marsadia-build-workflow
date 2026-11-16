@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1 — 17 November 2026
+
+- Installation: how to make the workflow the default for every project (the account copy, the
+  personal skills folder, and one line in `~/.claude/CLAUDE.md`).
+- The author's credit added to the skill, the workflow and the README.
+
 ## 1.1.0 — 17 November 2026
 
 - **The owner's setting.** Right after installation the owner is asked one question and answers with

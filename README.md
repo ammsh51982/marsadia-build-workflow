@@ -1,6 +1,8 @@
 # Marsadia Build Workflow
 
-Version 1.1.0 · private
+Version 1.1.1 · private
+
+*Created by Dr. Ahmed Hegazy — a physician bringing AI into everyday healthcare, and the founder of Marsadia.*
 
 An owner-led way of building software with Claude: the owner decides the product in plain words and
 never reads code; fresh Claude Code sessions build it slice by slice; an independent reviewer checks
@@ -47,6 +49,16 @@ mkdir -p ~/.claude/skills
 cp -R marsadia-build-workflow/marsadia-build-workflow ~/.claude/skills/
 ```
 
+**Make it your default for every project**
+
+The two installs above cover everything: the account copy is used by chats and cloud sessions, the
+`~/.claude/skills/` copy by Claude Code on that computer. To make the workflow the stated default,
+add one line to your personal instructions file, `~/.claude/CLAUDE.md`:
+
+```
+My default build workflow is the marsadia-build-workflow skill. Use it for all build work in every project.
+```
+
 **In a project**
 
 ```bash
@@ -75,8 +87,8 @@ becomes *Proven* once it has run for a full slice in a real project.
 
 ## Before this repository is made public
 
-- [ ] No project names, account names, addresses or product details in any file (`SKILL.md` names the
-      private repository's owner — replace it).
+- [ ] No project names, account names, addresses or product details in any file, apart from the
+      author's credit (`SKILL.md` names the private repository's owner — replace it).
 - [ ] No real person's data in any template or example.
 - [ ] A licence chosen by the owner and added as `LICENSE`.
 - [ ] The installation steps re-checked against the tools' current documentation.

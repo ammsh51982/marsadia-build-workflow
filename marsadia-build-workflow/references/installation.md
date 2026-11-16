@@ -62,6 +62,28 @@ cp -R marsadia-build-workflow/marsadia-build-workflow ~/.claude/skills/
 For Claude chat, save the skill to the account (the advisor chat can propose it for saving).
 A cloud session that should use the templates attaches the repository and reads them from there.
 
+### 4a. Make it the default for every project
+
+Where the skill is installed decides where it works:
+
+| Installed in | Works in |
+| --- | --- |
+| The Claude account | Chats, and Claude Code sessions both local and in the cloud |
+| `~/.claude/skills/` on a computer | Every project on that computer; not cloud sessions |
+| A project's own `.claude/skills/` | That project only — not the place for a default |
+
+Install it in the first two and it is available everywhere; Claude picks it up when the work
+matches its description. To make it the stated default as well, add one line to the personal
+instructions file that Claude Code loads in every session, `~/.claude/CLAUDE.md` (create the file
+if it does not exist):
+
+```
+My default build workflow is the marsadia-build-workflow skill. Use it for all build work in every project.
+```
+
+A global install gives Claude the workflow. Each project still gets its own files once — steps 5
+to 10 below.
+
 ## Once per project
 
 ### 5. spec-kit in the project
