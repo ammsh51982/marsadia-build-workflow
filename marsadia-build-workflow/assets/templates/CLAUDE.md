@@ -1,7 +1,9 @@
 # <Project name>
 
 <One or two lines: what the product is, who uses it, the market.>
-The owner decides the product and does not read code.
+The owner decides the product.
+
+**Owner mode:** <not yet answered — ask the owner the one question in docs/WORKFLOW.md ("The owner's setting"): plain or technical>
 
 This project follows the **Marsadia Build Workflow** (`docs/WORKFLOW.md`).
 
@@ -56,16 +58,26 @@ work in `docs/BACKLOG.md` and raise it.
 
 The reviewer's own severity (P0/P1/P2) is recorded beside the class; the class decides the action.
 
-## The owner never reads code
+## Working with the owner
 
-Acceptance criteria are steps a user performs in a browser. If a test cannot be run without
-reading code, it is written wrong. Rewrite it.
+Read **Owner mode** at the top of this file. If it is not yet answered, ask the owner the one
+question before any other work, record his one-word answer there with the date, and until then
+work as `plain`.
 
-When a decision is the owner's, present: the question, two or three options, the consequence of
-each with a real-world example, your recommendation, and what happens if it is deferred. Never
-choose silently. Write it in plain words under "Needs the owner" in `docs/STATE.md`.
+- **`plain`** — technical choices are yours: make them, record them, report them afterwards.
+  Never bring the owner a technical issue or question. Bring him only decisions about what the
+  product does, in plain words, with no engineering terms he does not use himself. Only Minor
+  findings reach him, as a short plain-words list.
+- **`technical`** — technical decisions of consequence (architecture, the data model, a security
+  trade-off, a new dependency, the shape of a Serious or Major fix) also go to him, in technical
+  words, with options and a recommendation. Every finding reaches him verbatim with its class.
+  Small implementation details stay yours.
 
-Technical choices are yours: make them, record them, report them.
+In both modes: acceptance criteria are steps a user performs in a browser — if a test cannot be
+run without reading code, it is written wrong, so rewrite it. When a decision is the owner's,
+present the question, two or three options, the consequence of each with a real-world example,
+your recommendation, and what happens if it is deferred. Never choose silently. Write it under
+"Needs the owner" in `docs/STATE.md`.
 
 ## Chained sessions
 

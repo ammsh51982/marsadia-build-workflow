@@ -90,6 +90,11 @@ and acceptance templates, the three scheduled-task instructions under `docs/prom
 `SessionStart` hook, the `/wrap` command, a checks skeleton and `scripts/session-guard.mjs`. It
 never overwrites a file that exists; it lists those for comparing by hand.
 
+The script ends with one question for the owner — **plain** or **technical** — and writes his
+one-word answer into `CLAUDE.md` as `Owner mode:`. Run without a keyboard (inside a session), it
+leaves the line unanswered and Claude asks him instead. To set it in the same command:
+`bash …/install.sh <project-folder> plain`.
+
 Then fill the angle-bracket placeholders in `CLAUDE.md`, `AGENTS.md` and `docs/STATE.md`, and check
 the guard:
 

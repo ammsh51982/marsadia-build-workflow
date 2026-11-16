@@ -5,7 +5,7 @@ description: The owner's default way of building software with Claude — an own
 
 # Marsadia Build Workflow
 
-Version 1.0.0 · Templates, scripts and the full text live in the repository
+Version 1.1.0 · Templates, scripts and the full text live in the repository
 `ammsh51982/marsadia-build-workflow` (private). When that repository can be attached or is installed
 beside this file, read its `references/` and use its `assets/templates/` and `scripts/`. When it
 cannot be reached, this file alone is enough to run the workflow.
@@ -44,13 +44,42 @@ Know which role you are in. An advisor chat does not build; a build session does
 the owner, merge, or request the security review. If the owner says one chat is the project's
 controlling session, other chats give notes and do not act on the project.
 
+## The owner's setting — ask once
+
+Some owners are engineers and want the technical decisions too. So right after the workflow is
+installed in a project, before any other work, ask this one question and take a one-word answer:
+
+> "How should technical matters reach you? Answer with one word.
+> **plain** — I decide technical matters myself and report them afterwards. I bring you only the
+> decisions about what the product does, in plain words with examples.
+> **technical** — I also bring you the technical decisions, in technical words, and you decide them."
+
+Record the answer in the project's `CLAUDE.md` as `Owner mode: plain` or `Owner mode: technical`,
+with the date; every session reads it there. Do not ask again when that line is filled, or when
+the owner's standing preference is already known to you. He can change it at any time with the
+same one word. If a session must act before he has answered, work as `plain` and say so.
+
+| | `plain` | `technical` |
+| --- | --- | --- |
+| Product and domain decisions | The owner's, in plain words with a real-world example | The owner's; technical words are fine |
+| Technical decisions of consequence — architecture, the data model, a security trade-off, a new dependency, the shape of a Serious or Major fix | You decide, record and report afterwards. Never brought to him as an issue or a question | Brought to him as a decision, in technical words, with options and a recommendation |
+| Small implementation details | You decide | You decide |
+| Review findings | Only Minors reach him, as a short plain-words list | Every finding reaches him verbatim with its class |
+| Words | No engineering terms he does not use himself | Engineering terms as they are |
+| Acceptance | Steps in a browser | Steps in a browser; he may also read the pull request |
+
+In both modes: never choose silently where the choice is his, never invent domain content, and
+record every decision.
+
 ## Talking to the owner
 
-- The dividing line is how a user works. Anything that changes it is his decision. Everything
-  else — technical and implementation choices — you decide, record and report afterwards.
+- The dividing line is how a user works. Anything that changes it is his decision, in both
+  modes. Technical and implementation choices follow the owner's setting above: in `plain` mode
+  you decide, record and report afterwards, and you do not bring him a technical issue or
+  question; in `technical` mode the ones of consequence go to him.
 - Bring a decision as: the question, two or three options, what each means with a real-world
   example from his field, your recommendation, and what happens if it is deferred. One decision
-  at a time. Plain words; no engineering terms he does not use himself.
+  at a time. In `plain` mode: plain words, no engineering terms he does not use himself.
 - Screen layouts and visual design are his to choose, on drawn options. What is built before he
   chooses is a working layout, not the design.
 - Never invent domain content — a rule, a required field, a threshold, terminology. If it is
@@ -106,7 +135,8 @@ The reviewer's severity (P0/P1/P2) is recorded; the class below decides the acti
 | Minor | Needs a contrived sequence, touches one reader's one page, or is wording | Queued with its reasoning; built only on the owner's word |
 
 Serious and Major are handled without consulting the owner unless the shape of the fix changes
-how a user works. Minors reach him as a short plain-words list. Findings are numbered once across
+how a user works. Minors reach him as a short plain-words list. (In `technical` mode every finding
+reaches him, as the owner's setting says.) Findings are numbered once across
 the whole project in `docs/<slice>-SWEEP.md`.
 
 ## Standing files
@@ -206,5 +236,6 @@ owner; separate the live site from the test area before the first real user's da
 | Every stage in full, the phases, the reviewer's measured behaviour | `references/workflow.md` |
 | Installing spec-kit, GitHub, the reviewer and the scheduled tasks | `references/installation.md` |
 | The apply / continue / in-stages question, and the stages | `references/adopting.md` |
+| The owner's setting recorded for a project | The `Owner mode:` line in the project's `CLAUDE.md` |
 | Project files to copy | `assets/templates/` (placed by `scripts/install.sh <project-folder>`) |
 | The chain, check-in and daily-check instructions | `assets/templates/docs/prompts/` |

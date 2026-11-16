@@ -1,6 +1,6 @@
 # Marsadia Build Workflow
 
-Version 1.0.0 · private
+Version 1.1.0 · private
 
 An owner-led way of building software with Claude: the owner decides the product in plain words and
 never reads code; fresh Claude Code sessions build it slice by slice; an independent reviewer checks
@@ -10,6 +10,17 @@ every phase; nothing goes live without the owner's acceptance.
 brief  →  spec, plan, tasks (spec-kit)  →  plan review  →  phased build by chained sessions
        →  code review per phase  →  the owner's acceptance  →  security review  →  merge  →  record
 ```
+
+## One question after installing
+
+Some owners are engineers. Right after the workflow is installed in a project, the owner is asked how
+technical matters should reach him, and answers with one word:
+
+- **plain** — Claude decides technical matters and reports them afterwards; only decisions about what
+  the product does reach the owner, in plain words with examples.
+- **technical** — the owner also receives the technical decisions, in technical words, and decides them.
+
+The answer is kept in the project's `CLAUDE.md` as `Owner mode:` and can be changed at any time.
 
 ## What is in this repository
 
@@ -43,7 +54,7 @@ uv tool install specify-cli                              # spec-kit, once per co
 cd <project-folder>
 specify init --here --force --integration claude         # spec-kit in the project
 specify extension add git
-bash ~/.claude/skills/marsadia-build-workflow/scripts/install.sh .
+bash ~/.claude/skills/marsadia-build-workflow/scripts/install.sh .   # ends with the one question: plain or technical
 node scripts/session-guard.mjs                           # expect: verdict: GO
 ```
 

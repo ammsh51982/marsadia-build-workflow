@@ -1,6 +1,6 @@
 # Marsadia Build Workflow — the full workflow
 
-Version 1.0.0
+Version 1.1.0
 
 A workflow for building software with AI sessions when the owner decides the product and never reads code.
 It is project-neutral: replace the names in angle brackets with your own.
@@ -21,7 +21,19 @@ Contents: 1 Roles · 2 Standing files · 3 The slice loop · 4 Spec-kit steps ·
 | **Independent reviewer** | Codex on the pull request | Code review and security review |
 | **CI** | Automatic checks on every pull request | Lint, typecheck, tests, build, isolation or security suite |
 
-The dividing line: anything that changes how a user works is the owner's decision. Everything else is decided by the advisor chat and reported afterwards.
+The dividing line: anything that changes how a user works is the owner's decision. Everything else follows the owner's setting below.
+
+### The owner's setting
+
+Some owners are engineers. Right after the workflow is installed in a project, the owner is asked one question and answers with one word; the answer is recorded in `CLAUDE.md` as `Owner mode:`. It is not asked again, and he can change it at any time with the same word. Until he answers, sessions work as `plain`.
+
+| | `plain` | `technical` |
+| --- | --- | --- |
+| Product and domain decisions | The owner's, in plain words with a real-world example | The owner's; technical words are fine |
+| Technical decisions of consequence (architecture, the data model, a security trade-off, a new dependency, the shape of a Serious or Major fix) | Decided by the advisor chat, recorded, reported afterwards; never brought to him as an issue or a question | Brought to him as a decision, in technical words, with options and a recommendation |
+| Small implementation details | Decided by the sessions | Decided by the sessions |
+| Review findings | Only Minors reach him, as a short plain-words list | Every finding reaches him verbatim with its class |
+| Acceptance | Steps in a browser | Steps in a browser; he may also read the pull request |
 
 ---
 
@@ -124,8 +136,8 @@ The reviewer's own severity is recorded, but the class below decides the action.
 | **Major** | Needs a stolen credential, or two people acting on the same thing in the same instant | Fixed once per slice, in one bundle at the close |
 | **Minor** | Needs a contrived sequence, touches one reader's one page, or is wording | Queued with its reasoning; built only on the owner's word |
 
-- Serious and Major are handled without consulting the owner, unless the shape of the fix changes how a user works.
-- Minors reach the owner as a short plain-words list to approve queuing.
+- In `plain` mode, Serious and Major are handled without consulting the owner, unless the shape of the fix changes how a user works, and Minors reach him as a short plain-words list to approve queuing.
+- In `technical` mode, every finding reaches him verbatim with its class, and the shape of a Serious or Major fix is his to decide.
 - Findings are decided before they are fixed.
 
 ---
@@ -221,7 +233,7 @@ The state of the work is always read from the repository, never from a timer or 
 | Merge | One word; the advisor chat does the clicks |
 | Post-merge record | One word to merge it |
 
-Every decision is brought as: the question, two or three options, the consequence of each with a real-world example, a recommendation, and what happens if it is deferred.
+Every decision is brought as: the question, two or three options, the consequence of each with a real-world example, a recommendation, and what happens if it is deferred. In `technical` mode he also receives the technical decisions of consequence, in technical words.
 
 ---
 
