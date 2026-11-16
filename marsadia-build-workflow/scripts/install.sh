@@ -1,37 +1,56 @@
 #!/usr/bin/env bash
 # Marsadia Build Workflow — put the workflow's files into a project.
 #
-#   bash <path-to-skill>/scripts/install.sh <project-folder> [plain|technical]
+#   bash <path-to-skill>/scripts/install.sh <project-folder> [plain|technical] [scheduled|continuous]
 #
 # It copies the templates and the session guard into the project. It never
 # overwrites a file that already exists: an existing file is left as it is and
 # listed at the end, so nothing of an existing project is lost.
 #
-# It ends with one question for the owner, answered with one word:
-#   plain      Claude decides technical matters and reports them; only product decisions,
-#              in plain words, reach the owner.
-#   technical  the owner also receives the technical decisions, in technical words.
-# The answer is written into the project's CLAUDE.md as "Owner mode". Give it as the second
-# argument to skip the question. Run without a keyboard (inside a session), the question is
+# It ends with two questions for the owner, each answered with one word:
+#
+#   Owner mode — how technical matters reach the owner
+#     plain       Claude decides technical matters and reports them; only product decisions,
+#                 in plain words, reach the owner.
+#     technical   the owner also receives the technical decisions, in technical words.
+#
+#   Session mode — how the build sessions follow each other
+#     scheduled   a session starts at fixed times (every five hours by default).
+#     continuous  the next session starts as soon as the last one finishes. The default
+#                 when unanswered.
+#
+# The answers are written into the project's CLAUDE.md. Give the words as arguments (in any
+# order) to skip the questions. Run without a keyboard (inside a session), the questions are
 # left for Claude to ask.
 #
 # It does not install spec-kit and does not touch GitHub; references/installation.md
 # covers those steps.
 set -euo pipefail
 
-if [ $# -lt 1 ]; then
-  echo "usage: bash install.sh <project-folder> [plain|technical]" >&2
+usage() {
+  echo "usage: bash install.sh <project-folder> [plain|technical] [scheduled|continuous]" >&2
   exit 1
-fi
-MODE="${2:-}"
-if [ -n "$MODE" ] && [ "$MODE" != "plain" ] && [ "$MODE" != "technical" ]; then
-  echo "The owner's setting is one word: plain or technical (got: $MODE)" >&2
-  exit 1
-fi
+}
+
+[ $# -ge 1 ] || usage
 
 SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TEMPLATES="$SKILL_DIR/assets/templates"
 TARGET="$1"
+shift
+
+OWNER_MODE=""
+SESSION_MODE=""
+for word in "$@"; do
+  case "$word" in
+    plain | technical) OWNER_MODE="$word" ;;
+    scheduled | continuous) SESSION_MODE="$word" ;;
+    *)
+      echo "Not one of the four words (plain, technical, scheduled, continuous): $word" >&2
+      exit 1
+      ;;
+  esac
+done
 
 if [ ! -d "$TARGET" ]; then
   echo "The project folder does not exist: $TARGET" >&2
@@ -76,38 +95,60 @@ if [ "${#kept[@]}" -gt 0 ]; then
   echo "Already there, left untouched (${#kept[@]}) — compare each with the template by hand:"
   for f in "${kept[@]}"; do echo "  = $f   (template: $TEMPLATES/$f)"; done
 fi
-# The owner's setting — one question, one word.
-UNANSWERED='**Owner mode:** <not yet answered'
-if [ -f "$TARGET/CLAUDE.md" ] && grep -qF "$UNANSWERED" "$TARGET/CLAUDE.md"; then
-  if [ -z "$MODE" ] && [ -t 0 ]; then
+
+# ---------------------------------------------------------------------------
+# The owner's two settings — one question each, one word each.
+# ---------------------------------------------------------------------------
+TODAY="$(date +%Y-%m-%d)"
+
+# setting <label> <current value> <word 1> <word 2> <question> <meaning 1> <meaning 2> <if unanswered>
+# Asks when a keyboard is attached and no word was given; writes the answer into
+# CLAUDE.md where the line is still unanswered.
+setting() {
+  local label="$1" value="$2" one="$3" two="$4" question="$5" mean_one="$6" mean_two="$7" unanswered_note="$8"
+  local marker="**$label:** <not yet answered"
+  local file="$TARGET/CLAUDE.md"
+
+  if [ -f "$file" ] && grep -qF "$marker" "$file"; then
+    if [ -z "$value" ] && [ -t 0 ]; then
+      echo
+      echo "A question for the owner — $question"
+      printf '  %-11s %s\n' "$one" "$mean_one"
+      printf '  %-11s %s\n' "$two" "$mean_two"
+      while [ "$value" != "$one" ] && [ "$value" != "$two" ]; do
+        printf 'Answer with one word (%s / %s): ' "$one" "$two"
+        read -r value || break
+      done
+    fi
+    if [ "$value" = "$one" ] || [ "$value" = "$two" ]; then
+      local line="**$label:** $value (the owner's answer, $TODAY)"
+      awk -v marker="$marker" -v line="$line" \
+        'index($0, marker) == 1 { print line; next } { print }' \
+        "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+      echo
+      echo "$label recorded in CLAUDE.md: $value"
+    else
+      echo
+      echo "$label is not answered yet. Claude asks the owner: \"$question $one or $two?\" $unanswered_note"
+    fi
+  elif [ -n "$value" ]; then
     echo
-    echo "One question for the owner — how should technical matters reach you?"
-    echo "  plain      Claude decides technical matters and reports them afterwards;"
-    echo "             only decisions about what the product does reach you, in plain words."
-    echo "  technical  you also receive the technical decisions, in technical words, and decide them."
-    while [ "$MODE" != "plain" ] && [ "$MODE" != "technical" ]; do
-      printf "Answer with one word (plain / technical): "
-      read -r MODE || break
-    done
+    echo "$label ($value) was not written, because CLAUDE.md already carries its own text."
+    echo "Add this line to it by hand:   **$label:** $value"
   fi
-  if [ "$MODE" = "plain" ] || [ "$MODE" = "technical" ]; then
-    TODAY="$(date +%Y-%m-%d)"
-    MODE_LINE="**Owner mode:** $MODE (the owner's answer, $TODAY)"
-    awk -v unanswered="$UNANSWERED" -v line="$MODE_LINE" \
-      'index($0, unanswered) == 1 { print line; next } { print }' \
-      "$TARGET/CLAUDE.md" > "$TARGET/CLAUDE.md.tmp" && mv "$TARGET/CLAUDE.md.tmp" "$TARGET/CLAUDE.md"
-    echo
-    echo "Owner mode recorded in CLAUDE.md: $MODE"
-  else
-    echo
-    echo "Owner mode is not answered yet. Claude asks the owner one question before any other work:"
-    echo "  \"How should technical matters reach you — plain or technical?\""
-  fi
-elif [ -n "$MODE" ]; then
-  echo
-  echo "CLAUDE.md was already there, so Owner mode ($MODE) was not written. Add this line to it by hand:"
-  echo "  **Owner mode:** $MODE"
-fi
+}
+
+setting "Owner mode" "$OWNER_MODE" plain technical \
+  "how should technical matters reach you?" \
+  "Claude decides technical matters and reports them afterwards; only decisions about what the product does reach you, in plain words." \
+  "you also receive the technical decisions, in technical words, and decide them." \
+  "Until then sessions work as plain."
+
+setting "Session mode" "$SESSION_MODE" scheduled continuous \
+  "how should the build sessions follow each other?" \
+  "a session starts at fixed times, every five hours by default; work can sit idle until the next one." \
+  "the next session starts as soon as the last one finishes; no idle time, but the advisor chat must stay active." \
+  "Until then the mode is continuous."
 
 echo
 echo "Next:"

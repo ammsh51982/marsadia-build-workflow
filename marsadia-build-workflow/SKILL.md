@@ -7,7 +7,7 @@ description: The owner's default way of building software with Claude — an own
 
 *Created by Dr. Ahmed Hegazy — a physician bringing AI into everyday healthcare, and the founder of Marsadia.*
 
-Version 1.1.1 · Templates, scripts and the full text live in the repository
+Version 1.2.0 · Templates, scripts and the full text live in the repository
 `ammsh51982/marsadia-build-workflow` (private). When that repository can be attached or is installed
 beside this file, read its `references/` and use its `assets/templates/` and `scripts/`. When it
 cannot be reached, this file alone is enough to run the workflow.
@@ -72,6 +72,32 @@ same one word. If a session must act before he has answered, work as `plain` and
 
 In both modes: never choose silently where the choice is his, never invent domain content, and
 record every decision.
+
+## How sessions follow each other — ask once
+
+The second question after installation, also answered with one word:
+
+> "How should the build sessions follow each other? Answer with one word.
+> **scheduled** — a session starts at fixed times, every five hours unless you name another
+> interval. Nothing has to stay open, but work can sit idle between a session finishing and the
+> next fixed time.
+> **continuous** — the next session starts as soon as the last one finishes. No idle time; it
+> needs the advisor chat to stay active to check, and it uses the plan's limits faster."
+
+Record the answer in the project's `CLAUDE.md` as `Session mode: scheduled` or
+`Session mode: continuous`, with the date. Unanswered means `continuous`. Ask once; he can change
+it at any time with the same word, and when it changes the advisor chat switches the chain task's
+schedule on or off and tells him.
+
+| | `scheduled` | `continuous` |
+| --- | --- | --- |
+| The chain task | Has a schedule — every five hours by default | No schedule; the advisor chat fires each session |
+| When the next session starts | At the next fixed time | As soon as the last one has finished |
+| Check-ins | Not needed for firing; the advisor chat reads the results and does the reviews it owes when the owner next opens the chat | Every 30 to 60 minutes while a session runs |
+| Idle time between sessions | Up to the schedule's interval | Up to one check-in interval |
+
+In both modes a firing still stops at the guard — on another session's marker, a question for
+the owner, a hold, or a slice ready for acceptance.
 
 ## Talking to the owner
 
@@ -195,23 +221,24 @@ owner" with a recommendation; the session finishes only what does not depend on 
 
 | Piece | What it does |
 | --- | --- |
-| The chain task | Starts a fresh build session with the standing instructions; automatic approval; its final paragraph goes to the owner's phone. Scheduled every few hours, or fired by hand |
-| Check-ins | One-off reminders the advisor chat sets for itself (every 30 to 60 minutes while a session runs), each carrying the state forward |
+| The chain task | Starts a fresh build session with the standing instructions; automatic approval; its final paragraph goes to the owner's phone. On a schedule or fired by hand, as the session mode says |
+| Check-ins | In `continuous` mode: one-off reminders the advisor chat sets for itself (every 30 to 60 minutes while a session runs), each carrying the state forward |
 | The daily email check | A read-only morning session reporting only what is still failing, plus security and billing notices |
 
-Hand-fired with check-ins loses no time between sessions; an automatic schedule is simpler but
-idles between a session ending and the next firing.
+Which of the two runs is the owner's choice — the session mode above. `continuous` loses no time
+between sessions; `scheduled` is simpler but idles between a session ending and the next firing.
 
 The advisor chat steers by writing the owner's rulings into the chain task's instructions (or the
 extra message of a hand firing), by setting the task's model (a default model builds; the strongest
 model only for the sessions it names — which model builds a phase is never the owner's question),
-and by releasing holds after doing the review or check itself. At each check-in:
+and by releasing holds after doing the review or check itself. At each check-in (in `scheduled`
+mode: whenever it reads the results):
 
 | It finds | It does |
 | --- | --- |
 | Marker open, last push recent | Waits; tells the owner nothing |
 | Marker open, no push for over an hour | Tells the owner and asks him to look at the session |
-| Marker clear, phases left, no hold | Fires the next session at once; confirms within minutes that it started |
+| Marker clear, phases left, no hold | `continuous`: fires the next session at once and confirms within minutes that it started. `scheduled`: leaves it to the next fixed time |
 | A hold stands | Does the review or check, then releases it |
 | New findings | Checks the class; Minors go to the owner as a short list |
 | A question under "Needs the owner" | Brings it to him with options, an example and a recommendation |
@@ -238,6 +265,6 @@ owner; separate the live site from the test area before the first real user's da
 | Every stage in full, the phases, the reviewer's measured behaviour | `references/workflow.md` |
 | Installing spec-kit, GitHub, the reviewer and the scheduled tasks | `references/installation.md` |
 | The apply / continue / in-stages question, and the stages | `references/adopting.md` |
-| The owner's setting recorded for a project | The `Owner mode:` line in the project's `CLAUDE.md` |
+| The owner's two settings recorded for a project | The `Owner mode:` and `Session mode:` lines in the project's `CLAUDE.md` |
 | Project files to copy | `assets/templates/` (placed by `scripts/install.sh <project-folder>`) |
 | The chain, check-in and daily-check instructions | `assets/templates/docs/prompts/` |

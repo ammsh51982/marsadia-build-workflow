@@ -112,10 +112,12 @@ and acceptance templates, the three scheduled-task instructions under `docs/prom
 `SessionStart` hook, the `/wrap` command, a checks skeleton and `scripts/session-guard.mjs`. It
 never overwrites a file that exists; it lists those for comparing by hand.
 
-The script ends with one question for the owner — **plain** or **technical** — and writes his
-one-word answer into `CLAUDE.md` as `Owner mode:`. Run without a keyboard (inside a session), it
-leaves the line unanswered and Claude asks him instead. To set it in the same command:
-`bash …/install.sh <project-folder> plain`.
+The script ends with two questions for the owner, each answered with one word, and writes the
+answers into `CLAUDE.md`: **plain** or **technical** (`Owner mode:` — how technical matters reach
+him) and **scheduled** or **continuous** (`Session mode:` — how the build sessions follow each
+other; unanswered means continuous). Run without a keyboard (inside a session), it leaves the lines
+unanswered and Claude asks him instead. To set them in the same command:
+`bash …/install.sh <project-folder> plain continuous`.
 
 Then fill the angle-bracket placeholders in `CLAUDE.md`, `AGENTS.md` and `docs/STATE.md`, and check
 the guard:
@@ -167,8 +169,8 @@ placed under `docs/prompts/`:
 
 | Task | From | Settings |
 | --- | --- | --- |
-| The chain | `docs/prompts/chain-task.md` | A fresh session each firing; automatic approval; push notifications on; the default build model; scheduled every few hours, or no schedule and fired by hand |
-| Check-ins | `docs/prompts/check-in.md` | One-off reminders into the advisor chat itself, every 30 to 60 minutes while a session runs |
+| The chain | `docs/prompts/chain-task.md` | A fresh session each firing; automatic approval; push notifications on; the default build model. `Session mode: scheduled` — a schedule, every five hours by default. `Session mode: continuous` — no schedule, fired by hand |
+| Check-ins | `docs/prompts/check-in.md` | `continuous` mode only: one-off reminders into the advisor chat itself, every 30 to 60 minutes while a session runs |
 | The daily email check | `docs/prompts/daily-email-check.md` | Once a day; read-only; needs the owner's email connector |
 
 A scheduled task takes the model it is set to, not the model of the session that happens to be

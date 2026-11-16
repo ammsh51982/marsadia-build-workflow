@@ -1,6 +1,6 @@
 # Marsadia Build Workflow
 
-Version 1.1.1 · private
+Version 1.2.0 · private
 
 *Created by Dr. Ahmed Hegazy — a physician bringing AI into everyday healthcare, and the founder of Marsadia.*
 
@@ -13,16 +13,26 @@ brief  →  spec, plan, tasks (spec-kit)  →  plan review  →  phased build by
        →  code review per phase  →  the owner's acceptance  →  security review  →  merge  →  record
 ```
 
-## One question after installing
+## Two questions after installing
 
-Some owners are engineers. Right after the workflow is installed in a project, the owner is asked how
-technical matters should reach him, and answers with one word:
+Right after the workflow is installed in a project, the owner is asked two questions and answers each
+with one word.
+
+**How should technical matters reach you?** Some owners are engineers.
 
 - **plain** — Claude decides technical matters and reports them afterwards; only decisions about what
   the product does reach the owner, in plain words with examples.
 - **technical** — the owner also receives the technical decisions, in technical words, and decides them.
 
-The answer is kept in the project's `CLAUDE.md` as `Owner mode:` and can be changed at any time.
+**How should the build sessions follow each other?**
+
+- **scheduled** — a session starts at fixed times, every five hours by default. Nothing has to stay
+  open, but work can sit idle until the next fixed time.
+- **continuous** — the next session starts as soon as the last one finishes. No idle time; the advisor
+  chat must stay active, and the plan's limits are used faster. This is the default when unanswered.
+
+The answers are kept in the project's `CLAUDE.md` as `Owner mode:` and `Session mode:` and can be
+changed at any time with the same word.
 
 ## What is in this repository
 
@@ -66,7 +76,7 @@ uv tool install specify-cli                              # spec-kit, once per co
 cd <project-folder>
 specify init --here --force --integration claude         # spec-kit in the project
 specify extension add git
-bash ~/.claude/skills/marsadia-build-workflow/scripts/install.sh .   # ends with the one question: plain or technical
+bash ~/.claude/skills/marsadia-build-workflow/scripts/install.sh .   # ends with the two one-word questions
 node scripts/session-guard.mjs                           # expect: verdict: GO
 ```
 

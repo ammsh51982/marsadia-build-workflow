@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.0 — 17 November 2026
+
+- **The session mode.** A second one-word question after installation: `scheduled` (sessions start
+  at fixed times, every five hours by default) or `continuous` (the next session starts as soon as
+  the last one finishes, with check-ins by the advisor chat). Recorded as `Session mode:` in the
+  project's `CLAUDE.md`; unanswered means `continuous`.
+- `install.sh` asks both questions (or takes the words as arguments) and writes the answers.
+- The workflow now lists the chain's time rules in one table.
+
 ## 1.1.1 — 17 November 2026
 
 - Installation: how to make the workflow the default for every project (the account copy, the

@@ -1,7 +1,9 @@
 # The check-in — the advisor chat's own reminder
 
-While a build session runs, the advisor chat sets itself a one-off reminder (every 30 to 60
-minutes) that arrives back in the same chat. Each reminder carries the state forward, because the
+Used when the project's `Session mode` is `continuous`. While a build session runs, the advisor
+chat sets itself a one-off reminder (every 30 to 60 minutes) that arrives back in the same chat.
+(In `scheduled` mode the chain fires itself; the advisor chat applies the same rules whenever it
+reads the results, except that it leaves the next firing to the schedule.) Each reminder carries the state forward, because the
 chat should act on what it last saw, not on a schedule. Rewrite the first paragraph at every
 check-in; keep the rules.
 

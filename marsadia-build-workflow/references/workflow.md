@@ -1,6 +1,6 @@
 # Marsadia Build Workflow — the full workflow
 
-Version 1.1.1 · Created by Dr. Ahmed Hegazy — a physician bringing AI into everyday healthcare, and the founder of Marsadia.
+Version 1.2.0 · Created by Dr. Ahmed Hegazy — a physician bringing AI into everyday healthcare, and the founder of Marsadia.
 
 A workflow for building software with AI sessions when the owner decides the product and never reads code.
 It is project-neutral: replace the names in angle brackets with your own.
@@ -193,10 +193,27 @@ When a decision is the owner's, the session writes the question in plain words u
 | **Check-ins** | One-off reminders the advisor chat sets for itself to read the repository while a session runs, each carrying the state forward to the next | Every 30 to 60 minutes while a session is running |
 | **Daily email check** | A read-only morning session that reads the repository's notification emails and reports only what is still failing, plus security and billing notices | Once a day |
 
-Two ways to run the chain:
+### How sessions follow each other — the owner's second setting
 
-- **Automatic schedule.** The task fires every few hours. Simple, but time is lost between a session ending and the next firing.
-- **Hand-fired with check-ins.** The schedule is off. The advisor chat checks on a rhythm and fires the next session the moment the last one ends. No idle time, but it depends on the advisor chat staying active.
+Right after installation the owner is asked a second one-word question; the answer is recorded in `CLAUDE.md` as `Session mode:`. Unanswered means `continuous`. He can change it at any time with the same word; the advisor chat then switches the chain task's schedule on or off and tells him.
+
+| | `scheduled` | `continuous` |
+| --- | --- | --- |
+| The chain task | Has a schedule — every five hours by default | No schedule; the advisor chat fires each session |
+| When the next session starts | At the next fixed time | As soon as the last one has finished |
+| Check-ins | Not needed for firing; the advisor chat reads the results and does its reviews when the owner next opens the chat | Every 30 to 60 minutes while a session runs |
+| Idle time between sessions | Up to the schedule's interval | Up to one check-in interval |
+| What it asks of the owner's plan | Less: sessions are spaced out | More: sessions run back to back, and the advisor chat must stay active |
+
+The time rules, in both modes:
+
+| Rule | Number |
+| --- | --- |
+| Longest a session works before it must begin `/wrap` | 3.5 hours after its first marker |
+| After a hand firing, confirming the session started | Within 5 minutes |
+| A marked session that has pushed nothing is treated as possibly stuck after | 60 minutes |
+| A new session refuses to start if another's marker is open and the branch moved within | 90 minutes |
+| A marker is read as stale after | 5 hours |
 
 ---
 
@@ -212,7 +229,7 @@ At each check-in the advisor chat reads the commits, the checks, the marker and 
 | --- | --- |
 | Marker open, last push recent | Waits; tells the owner nothing |
 | Marker open, no push for over an hour | Tells the owner and asks him to look at the session |
-| Marker clear, phases left, no hold | Fires the next session at once and confirms within minutes that it started |
+| Marker clear, phases left, no hold | `continuous`: fires the next session at once and confirms within minutes that it started. `scheduled`: leaves it to the next fixed time |
 | A hold stands | Does the review or check, then releases it |
 | New findings | Checks the class; Minors go to the owner as a short list |
 | A question under "Needs the owner" | Brings it to the owner with options, an example and a recommendation |

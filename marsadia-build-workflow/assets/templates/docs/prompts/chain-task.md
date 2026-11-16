@@ -5,8 +5,10 @@ angle-bracket placeholders. The advisor chat keeps the section "Owner rulings an
 how a session with no memory learns what the owner decided.
 
 Create it as a scheduled task that starts a **fresh** session each time, with automatic approval and
-push notifications on. Set its model to the default build model. Either give it a schedule (for
-example every five hours) or leave it without one and start each firing by hand.
+push notifications on. Set its model to the default build model. The project's `Session mode`
+(in `CLAUDE.md`) decides its schedule: `scheduled` — give it one, every five hours unless the owner
+named another interval; `continuous` — leave it without a schedule (or switched off) and fire each
+session by hand as soon as the last one has finished.
 
 ---
 

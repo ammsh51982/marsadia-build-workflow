@@ -5,6 +5,8 @@ The owner decides the product.
 
 **Owner mode:** <not yet answered — ask the owner the one question in docs/WORKFLOW.md ("The owner's setting"): plain or technical>
 
+**Session mode:** <not yet answered — ask the owner the second question in docs/WORKFLOW.md ("How sessions follow each other"): scheduled or continuous; unanswered means continuous>
+
 This project follows the **Marsadia Build Workflow** (`docs/WORKFLOW.md`).
 
 ## Read this first, every session
@@ -80,6 +82,10 @@ your recommendation, and what happens if it is deferred. Never choose silently. 
 "Needs the owner" in `docs/STATE.md`.
 
 ## Chained sessions
+
+**Session mode** at the top of this file says how sessions follow each other: `scheduled` — the
+chain task fires at fixed times; `continuous` — the advisor chat fires the next session as soon
+as the last one finishes. Either way a session behaves the same.
 
 Run `node scripts/session-guard.mjs` first. On STOP, touch nothing and say why in one line. On GO,
 write the marker (`--open <session name>`), commit and push it at once.

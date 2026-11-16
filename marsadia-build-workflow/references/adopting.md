@@ -18,12 +18,16 @@ the workflow when its `CLAUDE.md` names it or `docs/WORKFLOW.md` exists.
 | **Continue** | Nothing changes. Record the answer so the question is not asked again every session; ask again only when the project reaches a natural turning point (a release, a new module) |
 | **In stages** | The stages below, one at a time, each only on his word |
 
-## The second question, once the workflow is in
+## Two one-word questions, once the workflow is in
 
 Right after the workflow's files are in a project — whole or stage 1 — ask the owner's setting:
 **plain** or **technical** (the question is in `SKILL.md`, "The owner's setting"). Record his one
 word as `Owner mode:` in the project's `CLAUDE.md`. Skip it when his standing preference is
 already known; record that preference instead.
+
+When the chain is set up (stage 5, or a full installation), ask the second: **scheduled** or
+**continuous** ("How sessions follow each other"). Record it as `Session mode:`. Unanswered means
+`continuous`.
 
 ## The stages
 
