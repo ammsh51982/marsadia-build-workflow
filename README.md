@@ -1,6 +1,6 @@
 # Marsadia Build Workflow
 
-Version 1.2.0 · private
+Version 1.2.1
 
 *Created by Dr. Ahmed Hegazy — a physician bringing AI into everyday healthcare, and the founder of Marsadia.*
 
@@ -54,7 +54,7 @@ changed at any time with the same word.
 **In Claude Code on a computer**
 
 ```bash
-git clone https://github.com/<owner>/marsadia-build-workflow.git
+git clone https://github.com/ammsh51982/marsadia-build-workflow.git
 mkdir -p ~/.claude/skills
 cp -R marsadia-build-workflow/marsadia-build-workflow ~/.claude/skills/
 ```
@@ -95,12 +95,8 @@ The workflow is changed here first, then projects follow. A change raises the ve
 `references/workflow.md`, this file) and gets a line in `CHANGELOG.md`. A rule marked *Recommended*
 becomes *Proven* once it has run for a full slice in a real project.
 
-## Before this repository is made public
+## Licence
 
-- [ ] No project names, account names, addresses or product details in any file, apart from the
-      author's credit (`SKILL.md` names the private repository's owner — replace it).
-- [ ] No real person's data in any template or example.
-- [ ] A licence chosen by the owner and added as `LICENSE`.
-- [ ] The installation steps re-checked against the tools' current documentation.
-
-Until then: private, all rights reserved.
+No licence has been chosen yet. Until one is added, all rights are reserved by the author: you are
+welcome to read this repository and try the workflow, and please ask before redistributing it or
+building on it.

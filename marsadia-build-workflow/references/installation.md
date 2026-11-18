@@ -54,7 +54,7 @@ To pin a version for a team, use `uv tool install specify-cli==1.4.1`. To upgrad
 For Claude Code on the computer, copy the skill folder into the personal skills folder:
 
 ```bash
-git clone https://github.com/<owner>/marsadia-build-workflow.git
+git clone https://github.com/ammsh51982/marsadia-build-workflow.git
 mkdir -p ~/.claude/skills
 cp -R marsadia-build-workflow/marsadia-build-workflow ~/.claude/skills/
 ```

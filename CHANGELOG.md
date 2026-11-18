@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1 — 18 November 2026
+
+- Prepared for publication: the download commands carry the repository's real address, the
+  "private" notes are removed, and the README states that no licence has been chosen yet.
+- Checked before publication: no project, clinic or account details in any file or past version.
+
 ## 1.2.0 — 17 November 2026
 
 - **The session mode.** A second one-word question after installation: `scheduled` (sessions start
