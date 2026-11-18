@@ -7,7 +7,10 @@ description: The owner's default way of building software with Claude — an own
 
 *Created by Dr. Ahmed Hegazy — a physician bringing AI into everyday healthcare, and the founder of Marsadia.*
 
-Version 1.2.1 · Templates, scripts and the full text live in the repository
+*All rights reserved. You may install the skill and use the workflow on your own projects without
+asking; please ask before sharing a copy or publishing a changed version: marsadia.co@gmail.com*
+
+Version 1.2.2 · Templates, scripts and the full text live in the repository
 `ammsh51982/marsadia-build-workflow`. When that repository can be attached or is installed
 beside this file, read its `references/` and use its `assets/templates/` and `scripts/`. When it
 cannot be reached, this file alone is enough to run the workflow.

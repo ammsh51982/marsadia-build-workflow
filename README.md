@@ -1,6 +1,6 @@
 # Marsadia Build Workflow
 
-Version 1.2.1
+Version 1.2.2
 
 *Created by Dr. Ahmed Hegazy — a physician bringing AI into everyday healthcare, and the founder of Marsadia.*
 
@@ -95,8 +95,12 @@ The workflow is changed here first, then projects follow. A change raises the ve
 `references/workflow.md`, this file) and gets a line in `CHANGELOG.md`. A rule marked *Recommended*
 becomes *Proven* once it has run for a full slice in a real project.
 
-## Licence
+## Licence and permission
 
-No licence has been chosen yet. Until one is added, all rights are reserved by the author: you are
-welcome to read this repository and try the workflow, and please ask before redistributing it or
-building on it.
+No licence has been chosen. All rights are reserved by the author, with this permission:
+
+- **Without asking**, you may read this repository, install the skill and use the workflow on your
+  own projects.
+- **Please ask first** before sharing a copy of it or publishing a changed version.
+
+To ask, or for anything else about the workflow, write to **marsadia.co@gmail.com**.

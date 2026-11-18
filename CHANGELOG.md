@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.2 — 18 November 2026
+
+- The terms of use stated, on the author's decision: anyone may install the skill and use the
+  workflow on their own projects without asking; sharing a copy or publishing a changed version
+  needs the author's permission. All rights otherwise reserved.
+- A contact address for permission and questions: marsadia.co@gmail.com.
+- The same terms now travel inside the skill itself, so a copy installed anywhere carries them.
+
 ## 1.2.1 — 18 November 2026
 
 - Prepared for publication: the download commands carry the repository's real address, the
