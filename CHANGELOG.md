@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.5.0 — 20 November 2026
+
+- **The deep review works from cloud sessions.** It now runs OpenAI's official Codex action on
+  GitHub's own machines (new template `.github/workflows/codex-deep-review.yml`), at the effort
+  the depth asks for, started by `check-codex.mjs <owner/repo> deep <pr> <effort>` from any
+  session. It replaces the command-tool pass that needed Codex signed in on the owner's computer.
+- It needs an OpenAI API key, billed separately from ChatGPT, with a monthly limit the owner sets:
+  one yes at setup, and the owner pastes the key as the Actions secret `OPENAI_API_KEY` himself.
+  No session ever sees the key.
+- **The standing answer to a blocked reviewer is A, get Codex working:** no slice is built
+  meanwhile, and a barrier reaches the owner as what he needs to do. B and C apply only if he picks
+  one.
+- `check-codex.mjs` gains `deep` and `wait <pr> deep`.
+
 ## 1.4.0 — 20 November 2026
 
 - **How deep each review goes, picked automatically.** Claude gives every review a depth from what

@@ -15,6 +15,7 @@ steps 5 to 10 once per project. Checked against the tools' own documentation on 
 | Python 3.11 or newer and `uv` | spec-kit | `python3 --version`, `uv --version` |
 | spec-kit (`specify`) | Spec, plan, tasks, analysis | `specify version` |
 | The GitHub command tool (`gh`) | Pull requests, checks and review comments from a session | `gh --version` |
+| An OpenAI API key with a monthly limit (asked for at setup; billed separately from ChatGPT) | Deep reviews at a chosen effort, run on GitHub's machines | `node scripts/check-codex.mjs <owner/repo> deep <pr> high` |
 | OpenAI Codex connected to GitHub (a ChatGPT plan that includes Codex) | The independent reviewer | `node scripts/check-codex.mjs <owner/repo> look`, then the proof in `references/codex-review.md` |
 
 ## Once per computer
@@ -154,9 +155,12 @@ Claude does this step itself when it applies the workflow, and proves it with a 
 3. Set up in his signed-in browser: the Codex app's repository access on GitHub; Codex settings →
    the repository → Review code → Automatic review; a Codex environment if Codex asks for one.
 4. Fill the review rules in `AGENTS.md`, under `## Code Review Rules`.
-5. Prove it on a real pull request: `check-codex.mjs <owner/repo> review <pr>`, then
-   `review <pr> security`. Both must come back.
-6. Record `**Reviewer:**` in `CLAUDE.md`. No slice is built before it.
+5. Deep reviews: the owner's one yes for an OpenAI API key with a monthly limit; he pastes it as the
+   repository's Actions secret `OPENAI_API_KEY`.
+6. Prove it on a real pull request: `check-codex.mjs <owner/repo> review <pr>`, then
+   `review <pr> security`, then — once the workflow's files are merged — `deep <pr> high`. Each
+   must come back.
+7. Record `**Reviewer:**` in `CLAUDE.md`. No slice is built before it.
 
 Only barriers Claude cannot clear reach the owner, as one decision (section 8 of the reviewer
 guide). Current documentation: <https://learn.chatgpt.com/docs/third-party/github>.

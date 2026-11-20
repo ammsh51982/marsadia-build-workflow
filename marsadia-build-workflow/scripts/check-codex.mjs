@@ -10,9 +10,13 @@
  *       <pr>, from the GitHub account `gh` is signed in as, then waits for Codex. --focus adds
  *       the risky part for a Deep review: "@codex review for <text>" (code review only).
  *
- *   node scripts/check-codex.mjs <owner/repo> wait <pr> [code|security] [--since <time>] [--minutes <n>]
- *       Read only. Waits for Codex's answer to the latest request of that kind on <pr>, or to
- *       anything Codex posts after --since (an ISO time, for example when a pull request opened).
+ *   node scripts/check-codex.mjs <owner/repo> deep <pr> <effort> [--model <model>] [--focus "<text>"] [--minutes <n>]
+ *       Starts the deep review job (.github/workflows/codex-deep-review.yml) for the open pull
+ *       request <pr> at the given effort, then waits for its comment on the pull request.
+ *
+ *   node scripts/check-codex.mjs <owner/repo> wait <pr> [code|security|deep] [--since <time>] [--minutes <n>]
+ *       Read only. Waits for Codex's answer to the latest request of that kind on <pr> (for deep:
+ *       the latest deep review job), or to anything that arrives after --since (an ISO time).
  *
  * The last line printed is the verdict:
  *   result: CONFIRMED   the review came back
@@ -25,6 +29,7 @@
  * Settings: --minutes <n> how long to wait for an answer (default 30). DRY_RUN=1 prints the
  * comment instead of posting it. CODEX_LOGIN overrides the reviewer's GitHub login (default
  * chatgpt-codex-connector). CODEX_POLL_SECONDS sets the polling interval (default 30).
+ * CODEX_DEEP_WORKFLOW names the deep review workflow file (default codex-deep-review.yml).
  *
  * Needs the GitHub command tool `gh`, signed in. See docs/REVIEWER.md (references/codex-review.md).
  */
@@ -37,7 +42,8 @@ const START_MINUTES = 10;
 const USAGE = `usage:
   node check-codex.mjs <owner/repo> look
   node check-codex.mjs <owner/repo> review <pr> [code|security] [--focus "<text>"] [--minutes <n>]
-  node check-codex.mjs <owner/repo> wait <pr> [code|security] [--since <time>] [--minutes <n>]`;
+  node check-codex.mjs <owner/repo> deep <pr> <effort> [--model <model>] [--focus "<text>"] [--minutes <n>]
+  node check-codex.mjs <owner/repo> wait <pr> [code|security|deep] [--since <time>] [--minutes <n>]`;
 
 function fail(message, code = 1) {
   if (message) console.error(message);
@@ -45,13 +51,14 @@ function fail(message, code = 1) {
 }
 
 const [repo, mode, ...rest] = process.argv.slice(2);
-if (!repo || !/^[\w.-]+\/[\w.-]+$/.test(repo) || !['look', 'review', 'wait'].includes(mode)) {
+if (!repo || !/^[\w.-]+\/[\w.-]+$/.test(repo) || !['look', 'review', 'deep', 'wait'].includes(mode)) {
   fail(USAGE);
 }
 
 let minutes = 30;
 let since = null;
 let focus = null;
+let model = null;
 const words = [];
 for (let i = 0; i < rest.length; i += 1) {
   if (rest[i] === '--minutes') {
@@ -63,19 +70,29 @@ for (let i = 0; i < rest.length; i += 1) {
   } else if (rest[i] === '--focus') {
     i += 1;
     focus = (rest[i] ?? '').trim();
+  } else if (rest[i] === '--model') {
+    i += 1;
+    model = (rest[i] ?? '').trim();
   } else {
     words.push(rest[i]);
   }
 }
 if (!Number.isFinite(minutes) || minutes <= 0) fail('--minutes takes a positive number of minutes');
 if (since !== null && Number.isNaN(Date.parse(since))) fail(`--since is not a time: ${since}`);
-const [pr, kind = 'code'] = words;
-if (!['code', 'security'].includes(kind)) fail(`the kind of review is code or security, not: ${kind}`);
+const [pr, second] = words;
+const kind = mode === 'deep' ? 'deep' : second ?? 'code';
+const effort = mode === 'deep' ? second : null;
+const kinds = mode === 'wait' ? ['code', 'security', 'deep'] : ['code', 'security'];
+if (mode !== 'deep' && !kinds.includes(kind)) fail(`the kind of review is ${kinds.join(', ')}, not: ${kind}`);
+if (mode === 'deep' && !/^[a-z]+$/i.test(effort ?? '')) fail('give the effort after the pull request number, for example: deep 12 high');
 if (focus !== null) {
-  if (mode !== 'review' || kind !== 'code') fail('--focus is for a code review in review mode only; the security review is posted bare');
+  if (!(mode === 'deep' || (mode === 'review' && kind === 'code'))) {
+    fail('--focus is for a code review (review mode) or a deep review; the security review is posted bare');
+  }
   if (!focus) fail('--focus needs the risky part in a few words');
   focus = focus.replace(/^for\s+/i, '');
 }
+if (model !== null && (mode !== 'deep' || !model)) fail('--model is for a deep review only, followed by the model name');
 
 // ---------------------------------------------------------------------------
 // GitHub, through the `gh` command tool (it carries the sign-in).
@@ -93,6 +110,19 @@ function gh(args) {
   }
 }
 const get = (path) => gh(['api', path]);
+function tryGet(path) {
+  try {
+    const out = execFileSync('gh', ['api', path], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    return out.trim() ? JSON.parse(out) : null;
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      fail('The GitHub command tool (gh) is not installed; see references/installation.md.');
+    }
+    const said = String(error.stderr || error.message);
+    if (/HTTP 404|Not Found/i.test(said)) return null;
+    return fail(`GitHub refused or failed: ${said.trim().split('\n').pop()}`);
+  }
+}
 function list(path) {
   const all = [];
   for (let page = 1; page <= 10; page += 1) {
@@ -112,6 +142,8 @@ const SECURITY = /codex security review/i;
 const RECEIPT = /codex review:/i;
 const SUMMARY = /codex-pull-request-review-summary/;
 
+const DEEP_FILE = process.env.CODEX_DEEP_WORKFLOW ?? 'codex-deep-review.yml';
+const DEEP_MARK = /<!--\s*codex-deep-review:v1\s*-->/;
 const isCodex = (user) => Boolean(user && LOGIN.test(user.login ?? ''));
 const later = (time, than) => Boolean(time) && Date.parse(time) > Date.parse(than);
 const plain = (body) =>
@@ -219,6 +251,58 @@ async function waitFor(number, sinceTime, requestId, startedAt) {
   }
 }
 
+function deepRuns(sinceTime) {
+  const data = get(`repos/${repo}/actions/workflows/${DEEP_FILE}/runs?event=workflow_dispatch&per_page=20`);
+  return (data?.workflow_runs ?? [])
+    .filter((run) => later(run.created_at, sinceTime))
+    .sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at));
+}
+
+function deepAnswer(number, sinceTime) {
+  const answer = list(`repos/${repo}/issues/${number}/comments`).find(
+    (c) => DEEP_MARK.test(c.body ?? '') && later(c.created_at, sinceTime),
+  );
+  if (!answer) return null;
+  const text = String(answer.body).replace(/<!--[\s\S]*?-->/g, '');
+  const findings = (text.match(/\[P[01]\]/g) ?? []).length;
+  const summary = findings ? `${findings} finding(s) marked P0 or P1` : plain(text.split('\n').slice(2).join('\n'));
+  return { result: 'CONFIRMED', text: `the deep review came back — ${summary}`, at: answer.created_at, url: answer.html_url, code: 0 };
+}
+
+async function waitForDeep(number, sinceTime, startedAt) {
+  let lastNote = 0;
+  for (;;) {
+    const answered = deepAnswer(number, sinceTime);
+    if (answered) finish(answered, sinceTime);
+    const run = deepRuns(sinceTime)[0];
+    if (run && run.status === 'completed') {
+      const late = deepAnswer(number, sinceTime);
+      if (late) finish(late, sinceTime);
+      if (run.conclusion !== 'success') {
+        finish({
+          result: 'BARRIER',
+          text: `the deep review job ended "${run.conclusion}" — most often the OPENAI_API_KEY secret is missing or wrong, or its monthly limit is reached (reviewer guide, section 7)`,
+          url: run.html_url,
+          code: 3,
+        });
+      }
+      finish({ result: 'NO ANSWER', text: 'the deep review job finished, but Codex returned no message', url: run.html_url, code: 4 });
+    }
+    const elapsed = (Date.now() - startedAt) / 60000;
+    if (!run && elapsed >= Math.min(START_MINUTES, minutes)) {
+      finish({ result: 'NO START', text: 'the deep review job did not start — Actions may be off for the repository', code: 4 });
+    }
+    if (elapsed >= minutes) {
+      finish({ result: 'NO ANSWER', text: `the deep review did not come back within ${minutes} minutes`, url: run?.html_url, code: 4 });
+    }
+    if (Date.now() - lastNote >= 120000) {
+      console.log(`waiting for the deep review — ${Math.floor(elapsed)} min so far, ${run ? `the job is ${run.status}` : 'the job has not started yet'}`);
+      lastNote = Date.now();
+    }
+    await new Promise((resolve) => setTimeout(resolve, POLL_SECONDS * 1000));
+  }
+}
+
 function pullRequest(number) {
   if (!/^\d+$/.test(String(number ?? ''))) fail('give the pull request number, for example: review 12');
   return get(`repos/${repo}/pulls/${number}`);
@@ -279,6 +363,45 @@ if (mode === 'review') {
     );
   }
   await waitFor(pr, posted.created_at, posted.id, Date.now());
+}
+
+if (mode === 'deep') {
+  const pull = pullRequest(pr);
+  if (pull.state !== 'open') {
+    fail(`pull request #${pr} is ${pull.merged_at ? 'merged' : 'closed'}; the deep review needs an open one`);
+  }
+  const workflow = tryGet(`repos/${repo}/actions/workflows/${DEEP_FILE}`);
+  if (!workflow) {
+    console.log(
+      `result: BARRIER — the deep review workflow (${DEEP_FILE}) is not on the repository's main branch yet; merge the workflow's files first`,
+    );
+    process.exit(3);
+  }
+  const main = get(`repos/${repo}`).default_branch;
+  const fields = ['-f', `ref=${main}`, '-f', `inputs[pr]=${pr}`, '-f', `inputs[effort]=${effort}`];
+  if (model) fields.push('-f', `inputs[model]=${model}`);
+  if (focus) fields.push('-f', `inputs[focus]=${focus}`);
+  const said = `deep review of #${pr} at effort ${effort}${model ? `, model ${model}` : ''}${focus ? `, focus: ${focus}` : ''}`;
+  if (process.env.DRY_RUN === '1') {
+    console.log(`dry run — would start the ${said}`);
+    process.exit(0);
+  }
+  const sinceTime = new Date(Date.now() - 60000).toISOString();
+  gh(['api', '--method', 'POST', `repos/${repo}/actions/workflows/${DEEP_FILE}/dispatches`, ...fields]);
+  console.log(`started the ${said}`);
+  await waitForDeep(pr, sinceTime, Date.now());
+}
+
+if (mode === 'wait' && kind === 'deep') {
+  pullRequest(pr);
+  let sinceTime = since;
+  if (!sinceTime) {
+    const latest = (get(`repos/${repo}/actions/workflows/${DEEP_FILE}/runs?event=workflow_dispatch&per_page=1`)?.workflow_runs ?? [])[0];
+    if (!latest) fail('no deep review has been started on this repository; use deep mode');
+    sinceTime = new Date(Date.parse(latest.created_at) - 1000).toISOString();
+    console.log(`waiting on the deep review job started ${latest.created_at}`);
+  }
+  await waitForDeep(pr, sinceTime, Math.min(Date.now(), Date.parse(sinceTime)));
 }
 
 if (mode === 'wait') {

@@ -63,7 +63,10 @@ at once. Prove each migration on a stand-in database, then on the disposable CI 
 apply it to the hosted development environment. At the push that closes a phase, or a push
 carrying a migration that touches grants, policies or auth, post ONE comment on the pull request:
 `@codex review`, or for a Deep phase `@codex review for <the risky part, named in a few words>`
-(docs/REVIEWER.md section 10) — nothing else — and write the depth beside the request on the sweep. (When CLAUDE.md's Reviewer line reads `interim — fresh Claude
+(docs/REVIEWER.md section 10) — nothing else — and write the depth beside the request on the sweep.
+For a Deep or Deepest phase, when CLAUDE.md's Reviewer line does not say `deep reviews: off`, also
+run `node scripts/check-codex.mjs <owner>/<repo> deep <pr> <high|xhigh> --focus "<the risky part>"`
+and record what comes back like any review. (When CLAUDE.md's Reviewer line reads `interim — fresh Claude
 reviewer`, post nothing: set `phase: awaiting the advisor chat's review` and wrap.) When a review returns, record every finding verbatim on the sweep
 before anything is fixed, and class each Serious / Major / Minor: Serious fixed before anything
 else; Major once per slice in the close bundle; Minor queued and listed in plain words under "For

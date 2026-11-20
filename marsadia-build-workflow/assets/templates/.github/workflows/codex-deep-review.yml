@@ -1,0 +1,103 @@
+# Marsadia Build Workflow — the deep review: Codex at an effort Claude chooses, run on GitHub's own
+# machines with OpenAI's official Codex action, so it works from any session, cloud sessions included.
+#
+# Started for a Deep or Deepest phase (docs/REVIEWER.md, section 10):
+#   node scripts/check-codex.mjs <owner/repo> deep <pr> <effort> [--model <model>] [--focus "<text>"]
+# Its answer arrives as a comment on the pull request, marked <!-- codex-deep-review:v1 -->.
+#
+# Needs the repository's Actions secret OPENAI_API_KEY: an OpenAI API key, billed separately from
+# ChatGPT, with a monthly hard limit the owner sets. The key stays in GitHub's encrypted secrets; no
+# session ever sees it, and the action keeps Codex from reading it (safety-strategy: drop-sudo).
+# Dispatchable only once this file is on the repository's main branch.
+name: Codex deep review
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: Pull request number
+        required: true
+      effort:
+        description: Reasoning effort, as the model offers it (for example high, xhigh, max)
+        required: true
+        default: high
+      model:
+        description: Model; leave empty for Codex's default
+        required: false
+        default: ''
+      focus:
+        description: The risky part, in a few words (optional)
+        required: false
+        default: ''
+
+concurrency:
+  group: codex-deep-review-${{ inputs.pr }}
+  cancel-in-progress: false
+
+jobs:
+  codex:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      final_message: ${{ steps.run_codex.outputs.final-message }}
+    steps:
+      - name: Check out the pull request merged into its base
+        uses: actions/checkout@v5
+        with:
+          ref: refs/pull/${{ inputs.pr }}/merge
+          fetch-depth: 0
+          persist-credentials: false
+
+      # Codex runs as the job's last step, as OpenAI advises, with the key protected.
+      - name: Run Codex
+        id: run_codex
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          model: ${{ inputs.model }}
+          effort: ${{ inputs.effort }}
+          sandbox: read-only
+          safety-strategy: drop-sudo
+          output-file: codex-output.md
+          prompt: |
+            You are reviewing pull request #${{ inputs.pr }} of ${{ github.repository }}.
+            This checkout is the pull request merged into its base branch. Review only the changes
+            the pull request makes (`git diff HEAD^1 HEAD`), reading any other file you need.
+            Follow the "Code Review Rules" section of AGENTS.md.
+            Report only P0 and P1 findings, one per paragraph, each beginning [P0] or [P1], then
+            path:lines, then what is wrong, the evidence, and the consequence.
+            If there are none, answer exactly: No P0 or P1 findings.
+            Focus, if any: ${{ inputs.focus }}
+
+  post_feedback:
+    needs: codex
+    if: needs.codex.outputs.final_message != ''
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Post the deep review on the pull request
+        uses: actions/github-script@v7
+        env:
+          CODEX_FINAL_MESSAGE: ${{ needs.codex.outputs.final_message }}
+          PR_NUMBER: ${{ inputs.pr }}
+          EFFORT: ${{ inputs.effort }}
+          MODEL: ${{ inputs.model }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const model = process.env.MODEL ? `, model ${process.env.MODEL}` : ', Codex default model';
+            const body = [
+              '<!-- codex-deep-review:v1 -->',
+              `### Codex deep review — effort ${process.env.EFFORT}${model}`,
+              '',
+              process.env.CODEX_FINAL_MESSAGE,
+            ].join('\n');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: Number(process.env.PR_NUMBER),
+              body,
+            });
