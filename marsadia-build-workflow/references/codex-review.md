@@ -1,6 +1,6 @@
 # The reviewer — Codex review
 
-Part of the Marsadia Build Workflow, version 1.5.0. In each project this file is copied to
+Part of the Marsadia Build Workflow, version 1.6.0. In each project this file is copied to
 `docs/REVIEWER.md`.
 
 Codex, OpenAI's coding agent, reviews the work on every pull request. It is the workflow's
@@ -51,7 +51,6 @@ All of it lives in the owner's accounts; Claude only uses them.
 | The repository connected in Codex settings, with code review turned on for it | Once per project |
 | A Codex environment for the repository, if Codex asks for one | Once per project, when asked |
 | Push or admin permission on the repository, which automatic reviews need | Already true when the owner owns it |
-| For deep reviews: an OpenAI API key, billed separately from the ChatGPT plan, with a monthly limit the owner sets, stored as the repository's Actions secret `OPENAI_API_KEY` (section 10) | One key; pasted once per project |
 
 ## 4. Setting it up
 
@@ -78,11 +77,6 @@ All of it lives in the owner's accounts; Claude only uses them.
 4. **The rules.** `AGENTS.md` (placed by `install.sh`) carries the project's review rules under
    `## Code Review Rules`. Fill its placeholders with two or three of the project's most
    important rules per group. Formatting and lint belong to the automatic checks, not here.
-5. **Deep reviews.** Ask the owner once (section 10 gives the words). On yes, open in his browser
-   <https://platform.openai.com/api-keys> and the API project's limits page, and then
-   `https://github.com/<owner>/<repo>/settings/secrets/actions/new`. He creates the key, sets a
-   hard monthly limit, and pastes the key as the secret `OPENAI_API_KEY` himself. Claude never
-   sees, types or stores the key. On no, deep reviews stay off.
 
 ## 5. Proving it works
 
@@ -97,15 +91,11 @@ A setup is not finished until a real review has come back.
    shows no sign of starting within 10 minutes, post the same three words from the owner's own
    browser and run `node scripts/check-codex.mjs <owner/repo> wait <pr> security`. Posting it
    bare, from the owner's own browser, is the one way measured to work.
-4. **Deep review**, when it is on: `node scripts/check-codex.mjs <owner/repo> deep <pr> high`.
-   The workflow can only be started once its file is on the main branch, so this proof runs on the
-   next pull request after the workflow's files are merged — the small one that writes the
-   `Reviewer:` line suits it.
-5. **All came back** (`result: CONFIRMED`): write in `CLAUDE.md`
-   `**Reviewer:** Codex — code review, security review and deep review confirmed working on <date> (pull requests #<n>, #<m>)`
-   — or `…; deep reviews: off (the owner's choice)` — and tell the owner in one line. Any
-   finding they returned is handled like any other (section 6).
-6. **Otherwise** (`BARRIER`, `NO START`, `NO ANSWER`): section 7, then section 8.
+4. **Both came back** (`result: CONFIRMED`): write in `CLAUDE.md`
+   `**Reviewer:** Codex — code review and security review confirmed working on <date> (pull request #<n>)`,
+   and tell the owner in one line. Any finding they returned is handled like any other
+   (section 6).
+5. **Otherwise** (`BARRIER`, `NO START`, `NO ANSWER`): section 7, then section 8.
 
 The script's last line is its verdict; its exit code is 0 confirmed, 3 a barrier Codex reported,
 4 no start or no answer, 1 a usage or GitHub error.
@@ -141,9 +131,6 @@ Rules measured in practice:
 | `BARRIER` — "create an environment for this repo" | No Codex environment for the repository | Creates it (section 4, step 3c) and requests again |
 | `BARRIER` — any other message from Codex | Often a usage limit or an account matter | Reads it in full; if it concerns the owner's plan or account, section 8 |
 | `NO ANSWER` — Codex started but nothing came back in 30 minutes | A slow or stuck run, or a usage limit | Waits one more period; then section 8 |
-| Deep review `BARRIER` — the job ended failed | The `OPENAI_API_KEY` secret missing or wrong, or the API's monthly limit reached | Reads the job's log; a new key or a higher limit is the owner's, so it goes to him as what he needs to do. Meanwhile Deep phases go on with the focus line |
-| Deep review `BARRIER` — the workflow is not on the main branch | The workflow's files are not merged yet | Merges them through the normal pull request, then starts it again |
-| Deep review `NO START` | Actions turned off for the repository | Turns them on (with the owner's yes) |
 | Reviews requested by comment work, automatic ones never come | "Automatic review" off for the repository or in personal preferences; the account lacks push or admin permission | Turns it on (with the owner's yes); a missing permission goes to section 8 |
 
 ## 8. What goes to the owner
@@ -185,46 +172,23 @@ only when the owner picks one himself. B is recorded in `CLAUDE.md` as
 
 ## 10. Model, effort and how deep each review goes
 
-**On GitHub, OpenAI chooses the model and the effort.** Codex's GitHub documentation names no
-model, and there is no setting for model or effort: not in Codex settings, not per repository, not
-in the comment. When OpenAI introduced its review model it said the model adjusts how long it
-thinks to the size and difficulty of the change, so on GitHub "more for complex, less for simple"
-happens inside Codex. What Claude controls there is what Codex looks at: the focus line in the
-request and the rules in `AGENTS.md`.
+**OpenAI chooses the model and the effort.** Codex's GitHub documentation names no model, and
+there is no setting for model or effort: not in Codex settings, not per repository, not in the
+comment. When OpenAI introduced its review model it said the model adjusts how long it thinks to
+the size and difficulty of the change, so "more for complex, less for simple" happens inside Codex.
 
-**In the deep review job, Claude chooses the effort** (and, when needed, the model). The job runs
-OpenAI's official Codex action on GitHub's own machines (`.github/workflows/codex-deep-review.yml`,
-placed by `install.sh`), so it works from every session, cloud sessions included. One command
-starts it and waits for its answer, which arrives as a comment on the pull request:
-
-```
-node scripts/check-codex.mjs <owner/repo> deep <pr> high --focus "<the risky part>"
-```
-
-The levels a model offers vary (for example low, medium, high, xhigh, max); use the highest the
-depth below asks for that the model offers. Leave the model on Codex's own default, because model
-names change every few months. Name a stronger one with `--model` only after checking that the
-owner's account offers it.
-
-**What it needs: an OpenAI API key.** The action runs on an API key, not on the ChatGPT plan, and
-API use is billed separately, per use. At setup (section 4, step 5) the owner is asked once:
-"Deeper reviews of risky work need an OpenAI API key, billed separately, with a monthly limit you
-choose. Shall I set it up?" Some ChatGPT plans include a monthly API credit; check that before
-choosing the limit. The key lives only in GitHub's encrypted secrets: no session ever sees it, and
-the action keeps Codex itself from reading it (`safety-strategy: drop-sudo`). If the key ever
-appears in a log or an output, the owner replaces it at once. Without the key, deep reviews stay off
-and Deep phases rely on the focus line.
+**No paid extras.** Every review runs on the owner's ChatGPT plan, through Codex on GitHub. The
+workflow uses no OpenAI API key and nothing billed separately.
 
 **Claude picks the depth of every review itself**, from what the phase touches, and writes the
-depth beside the request in the slice's sweep. The owner is never asked.
+depth beside the request in the slice's sweep. The owner is never asked. The depth decides what
+Codex is pointed at:
 
-| Depth | The phase touches | On GitHub | The deep review job |
-| --- | --- | --- | --- |
-| Light | Only wording, documents or records | No review requested; the automatic checks only | Not run |
-| Standard | Ordinary screens and logic | `@codex review` | Not run |
-| Deep | A migration, permissions, sign-in, money, personal data, keeping customers' data apart, or many files at once | `@codex review for <the risky part, named in a few words>` | Effort `high` |
-| Deepest | The slice's close, or a phase where one mistake would expose one customer's data to another or let someone act without permission | The slice's security review at the close, as section 6 says | Effort `xhigh`, or `max` where the model offers it |
+| Depth | The phase touches | The request |
+| --- | --- | --- |
+| Light | Only wording, documents or records | None; the automatic checks only |
+| Standard | Ordinary screens and logic | `@codex review` |
+| Deep | A migration, permissions, sign-in, money, personal data, keeping customers' data apart, or many files at once | `@codex review for <the risky part, named in a few words>` |
+| Deepest | The slice's close, or a phase where one mistake would expose one customer's data to another or let someone act without permission | `@codex review for <the risky part>`; at the slice's close, the security review as well (section 6) |
 
-The deep review's findings are recorded verbatim and classed exactly like Codex's other findings.
-When deep reviews are off, or the job is blocked, the GitHub review stands alone and the sweep
-says so.
+A focused request costs nothing more than a plain one: it tells Codex where to look hardest.

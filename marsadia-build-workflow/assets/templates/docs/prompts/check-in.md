@@ -43,9 +43,6 @@ RULES
     docs/REVIEWER.md sections 7 and 8. Only section 8's barriers go to the owner.
 (i) The guard stopped because the reviewer is not confirmed → set it up and prove it
     (docs/REVIEWER.md sections 4 and 5), then fire.
-(j) A deep review job failed or did not come back → run
-    `node scripts/check-codex.mjs <owner>/<repo> wait <pr> deep` and follow docs/REVIEWER.md
-    section 7. A new key or a higher limit is the owner's: tell him what is needed in one line.
 
 Tell the owner only what changed or what needs his decision. Then set the next check-in, carrying
 this state forward.

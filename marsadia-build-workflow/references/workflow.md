@@ -1,6 +1,6 @@
 # Marsadia Build Workflow — the full workflow
 
-Version 1.5.0 · Created by Dr. Ahmed Hegazy — a physician bringing AI into everyday healthcare, and the founder of Marsadia.
+Version 1.6.0 · Created by Dr. Ahmed Hegazy — a physician bringing AI into everyday healthcare, and the founder of Marsadia.
 
 A workflow for building software with AI sessions when the owner decides the product and never reads code.
 It is project-neutral: replace the names in angle brackets with your own.
@@ -129,7 +129,7 @@ Notes on the reviewer:
 
 When the workflow is applied to a project (in stages: with stage 3, the first stage that uses pull requests), Claude sets up Codex review in the owner's accounts — after one yes from him for those setting changes — and proves it with a real code review and a real security review on a real pull request (`scripts/check-codex.mjs`). The result is recorded as `**Reviewer:**` in `CLAUDE.md`; the session guard lets no slice be built until it is filled. Only barriers Claude cannot clear reach the owner. The standing answer is to get Codex working, and no slice is built meanwhile; a fresh Claude reviewer, or none, applies only if the owner picks it. The full procedure is in `docs/REVIEWER.md`.
 
-Each review's depth (Light, Standard, Deep, Deepest) is picked by Claude from what the phase touches. Deep and Deepest phases also get a deep review: OpenAI's Codex action on GitHub's own machines, at the effort the depth asks for, started from any session. It needs an OpenAI API key with a monthly limit, asked for once at setup. See section 10 of `docs/REVIEWER.md`.
+Each review's depth (Light, Standard, Deep, Deepest) is picked by Claude from what the phase touches; for Deep and Deepest phases the request names the risky part, so Codex looks hardest there. Codex chooses its own model and effort, and every review runs on the owner's ChatGPT plan, with no API key and nothing billed separately. See section 10 of `docs/REVIEWER.md`.
 
 ---
 

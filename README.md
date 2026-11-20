@@ -1,6 +1,6 @@
 # Marsadia Build Workflow
 
-Version 1.5.0
+Version 1.6.0
 
 *Created by Dr. Ahmed Hegazy — a physician bringing AI into everyday healthcare, and the founder of Marsadia.*
 
@@ -40,9 +40,8 @@ No slice is built before it. Only what Claude cannot clear — for example a pla
 the owner — and the standing answer is to get Codex working, building nothing meanwhile.
 How deep each review goes is picked by Claude automatically from what the work touches: more for
 migrations, permissions, money and personal data, less for ordinary screens, none for wording. For
-the risky work, a deep review runs OpenAI's Codex action on GitHub's own machines at the effort
-Claude picks, from any session, cloud ones included. It needs an OpenAI API key, billed separately,
-with a monthly limit the owner sets.
+the risky work, the request tells Codex where to look hardest. Every review runs on the owner's
+ChatGPT plan: no OpenAI API key, nothing billed separately.
 
 ## What is in this repository
 
@@ -56,7 +55,7 @@ with a monthly limit the owner sets.
 | `marsadia-build-workflow/assets/templates/` | The files a project needs: `CLAUDE.md`, `AGENTS.md`, the state file, the brief, the decision record, the findings list, the acceptance sheet, the session hook, `/wrap`, a checks skeleton, and the instructions for the three scheduled tasks |
 | `marsadia-build-workflow/scripts/session-guard.mjs` | The guard every chained session runs first |
 | `marsadia-build-workflow/scripts/install.sh` | Places the templates in a project without overwriting anything |
-| `marsadia-build-workflow/scripts/check-codex.mjs` | Proves that Codex review answers on a repository, and starts the deep review |
+| `marsadia-build-workflow/scripts/check-codex.mjs` | Proves that Codex review answers on a repository |
 | `CHANGELOG.md` | What changed in each version |
 
 ## Install

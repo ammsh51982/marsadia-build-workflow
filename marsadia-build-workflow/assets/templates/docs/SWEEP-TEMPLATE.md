@@ -8,7 +8,7 @@ Each finding opens with a `**Status:**` line — `open`, `resolved` or `unverifi
 only place the status is recorded. Each carries the reviewer's severity and our class.
 
 **Review requests of this slice** (listed as they are made, each with its depth — Light, Standard,
-Deep or Deepest — and whether the deep review ran): none yet.
+Deep or Deepest): none yet.
 
 ---
 

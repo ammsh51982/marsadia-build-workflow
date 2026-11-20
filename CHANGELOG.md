@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.6.0 — 20 November 2026
+
+- **The deep review and the OpenAI API key are removed, on the owner's decision.** Every review runs
+  on the owner's ChatGPT plan, through Codex on GitHub; nothing is billed separately. Gone: the
+  workflow template `codex-deep-review.yml`, the `deep` modes of `check-codex.mjs`, the setup step
+  that asked for an API key, and their rows in the guides.
+- Kept: the automatic depth (Light, Standard, Deep, Deepest), which now only decides what Codex is
+  pointed at — a focus line naming the risky part for Deep and Deepest phases, at no extra cost.
+  Codex chooses its own model and effort.
+- Kept: the standing answer A, get Codex working, when the reviewer is blocked.
+
 ## 1.5.0 — 20 November 2026
 
 - **The deep review works from cloud sessions.** It now runs OpenAI's official Codex action on

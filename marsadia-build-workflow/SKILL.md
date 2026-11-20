@@ -10,7 +10,7 @@ description: The owner's default way of building software with Claude — an own
 *All rights reserved. You may install the skill and use the workflow on your own projects without
 asking; please ask before sharing a copy or publishing a changed version: marsadia.co@gmail.com*
 
-Version 1.5.0 · Templates, scripts and the full text live in the repository
+Version 1.6.0 · Templates, scripts and the full text live in the repository
 `ammsh51982/marsadia-build-workflow`. When that repository can be attached or is installed
 beside this file, read its `references/` and use its `assets/templates/` and `scripts/`. When it
 cannot be reached, this file alone is enough to run the workflow.
@@ -172,9 +172,9 @@ procedure is `references/codex-review.md`, copied into each project as `docs/REV
 4. **Prove** — on a real pull request: `check-codex.mjs <owner/repo> review <pr>` for the code
    review, then `review <pr> security` for the security review (posted bare from the owner's
    browser if it does not start). Both must come back.
-5. **Record** — `**Reviewer:** Codex — code review, security review and deep review confirmed
-   working on <date> (pull requests #<n>, #<m>)` in the project's `CLAUDE.md`, and one line to the
-   owner. The session guard lets no slice be built until this line is filled.
+5. **Record** — `**Reviewer:** Codex — code review and security review confirmed working on
+   <date> (pull request #<n>)` in the project's `CLAUDE.md`, and one line to the owner. The
+   session guard lets no slice be built until this line is filled.
 
 Claude clears what it can. Only real barriers reach the owner — his plan has no Codex, a step
 needs a permission he does not hold, Codex is still silent after the checks — as one decision in
@@ -187,12 +187,10 @@ needs to do; B or C apply only if he picks one.
 Codex's model and effort and offers no setting; Claude steers what Codex looks at. It picks a
 depth from what the phase touches: **Light** (wording, records: no review), **Standard**
 (`@codex review`), **Deep** (migrations, permissions, sign-in, money, personal data:
-`@codex review for <the risky part>`, plus a deep review at effort `high`), **Deepest** (the
-slice's close, or a phase that could expose one customer's data to another: effort `xhigh` or
-`max`). The deep review runs OpenAI's Codex action on GitHub's own machines, so it works from
-cloud sessions too: `check-codex.mjs <owner/repo> deep <pr> <effort>`. It needs an OpenAI API key —
-billed separately, with a monthly limit the owner sets — asked for once at setup; the key stays in
-GitHub's encrypted secrets and no session ever sees it. Details: section 10 of the reviewer guide.
+`@codex review for <the risky part>`), **Deepest** (the slice's close, or a phase that could
+expose one customer's data to another: the focused review, and the security review at the close).
+Codex itself adjusts how hard it thinks. No paid extras: every review runs on the owner's ChatGPT
+plan; the workflow uses no OpenAI API key. Details: section 10 of the reviewer guide.
 
 ## What happens to a finding
 
