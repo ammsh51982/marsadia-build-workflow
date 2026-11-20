@@ -10,7 +10,7 @@ description: The owner's default way of building software with Claude — an own
 *All rights reserved. You may install the skill and use the workflow on your own projects without
 asking; please ask before sharing a copy or publishing a changed version: marsadia.co@gmail.com*
 
-Version 1.2.2 · Templates, scripts and the full text live in the repository
+Version 1.3.0 · Templates, scripts and the full text live in the repository
 `ammsh51982/marsadia-build-workflow`. When that repository can be attached or is installed
 beside this file, read its `references/` and use its `assets/templates/` and `scripts/`. When it
 cannot be reached, this file alone is enough to run the workflow.
@@ -30,7 +30,7 @@ The owner decides what the product does and never reads code. The workflow exist
 | --- | --- |
 | The project's `CLAUDE.md` names this workflow, or `docs/WORKFLOW.md` exists | It is on the workflow. Read `docs/STATE.md` (on the open slice's branch) and act from it |
 | An existing project that is not on the workflow | **Ask the owner first**: apply the default build workflow, continue the current way, or apply it in stages. Change nothing until he answers. Stages and advice: `references/adopting.md` |
-| A new project | Install (`references/installation.md`), then a small first slice that walks the whole loop once |
+| A new project | Install (`references/installation.md`), set up and prove the reviewer (below), then a small first slice that walks the whole loop once |
 
 The state of the work is always read from the repository — commits, pull requests, checks,
 `docs/STATE.md` — never from a timer, a schedule or a chat's recollection.
@@ -155,6 +155,33 @@ A push does not re-trigger a review. A comment asking for both reviews runs only
 Every finding is reported verbatim — severity, file, lines, text — before anything is recorded or
 fixed.
 
+## The reviewer — set up and prove Codex review
+
+Codex review is part of the workflow, not an option. When the workflow is applied to a project,
+Claude sets it up and proves it works before the first slice is built; the owner does not have to
+ask. Applied in stages, it comes with stage 3, the first stage that uses pull requests. The full
+procedure is `references/codex-review.md`, copied into each project as `docs/REVIEWER.md`.
+
+1. **Look** — `node scripts/check-codex.mjs <owner/repo> look` shows, changing nothing, whether
+   Codex already reviews there.
+2. **Ask once** — letting the Codex app see the repository and turning on its review change the
+   owner's account settings. Ask in one line that names them; one yes covers this project.
+3. **Set up** — in the owner's signed-in browser: the Codex app's repository access on GitHub,
+   then Codex settings → the repository → Review code → Automatic review on, and a Codex
+   environment if Codex asks for one. Sign-in and two-step prompts are the owner's to approve.
+4. **Prove** — on a real pull request: `check-codex.mjs <owner/repo> review <pr>` for the code
+   review, then `review <pr> security` for the security review (posted bare from the owner's
+   browser if it does not start). Both must come back.
+5. **Record** — `**Reviewer:** Codex — code review and security review confirmed working on
+   <date> (pull request #<n>)` in the project's `CLAUDE.md`, and one line to the owner. The
+   session guard lets no slice be built until this line is filled.
+
+Claude clears what it can. Only real barriers reach the owner — his plan has no Codex, a step
+needs a permission he does not hold, Codex is still silent after the checks — as one decision in
+his setting's form: **A** get Codex working (recommended), **B** a fresh Claude session that took
+no part in the build reviews each phase meanwhile, **C** no independent reviewer. If he defers,
+B runs until Codex works.
+
 ## What happens to a finding
 
 The reviewer's severity (P0/P1/P2) is recorded; the class below decides the action.
@@ -184,6 +211,7 @@ the whole project in `docs/<slice>-SWEEP.md`.
 | `docs/BACKLOG.md` | Work discovered but not approved |
 | `specs/<slice>/` | spec-kit output: `spec.md`, `plan.md`, `research.md`, `data-model.md`, `contracts/`, `quickstart.md`, `tasks.md` |
 | `scripts/session-guard.mjs` | The guard every chained session runs first |
+| `docs/REVIEWER.md`, `scripts/check-codex.mjs` | How the reviewer is set up, proved and used; the check that proves it |
 
 ## Chained sessions
 
@@ -204,7 +232,8 @@ What one session does:
    request) and read `docs/STATE.md` on that branch.
 2. **Guard** — `node scripts/session-guard.mjs`. On STOP, touch nothing and say why in one line.
    It stops when another session's marker is open, when "Needs the owner" holds a question, when
-   a hold stands, and when the slice is ready for acceptance.
+   a hold stands, when the slice is ready for acceptance, and before any building while the
+   reviewer is not yet confirmed.
 3. **Mark** — `--open <name>`, commit and push at once.
 4. **Work by state** — open a slice when a brief arrives; otherwise build the next unbuilt phase
    and request the code review at its close; or write the post-merge record; or stop.
@@ -268,6 +297,7 @@ owner; separate the live site from the test area before the first real user's da
 | Every stage in full, the phases, the reviewer's measured behaviour | `references/workflow.md` |
 | Installing spec-kit, GitHub, the reviewer and the scheduled tasks | `references/installation.md` |
 | The apply / continue / in-stages question, and the stages | `references/adopting.md` |
+| Setting up, proving and using Codex review; what reaches the owner | `references/codex-review.md` (in a project: `docs/REVIEWER.md`) |
 | The owner's two settings recorded for a project | The `Owner mode:` and `Session mode:` lines in the project's `CLAUDE.md` |
 | Project files to copy | `assets/templates/` (placed by `scripts/install.sh <project-folder>`) |
 | The chain, check-in and daily-check instructions | `assets/templates/docs/prompts/` |

@@ -37,7 +37,7 @@ Each stage is useful by itself and safe to stop after.
 | --- | --- | --- | --- |
 | 1. The record | `docs/STATE.md`, the `SessionStart` hook, `/wrap`, `docs/decisions/`, `docs/BACKLOG.md` | Sessions stop depending on chat history; decisions are written down | An hour; no change to the code |
 | 2. The triage | Serious / Major / Minor in `CLAUDE.md`; a sweep file for findings | Only product questions reach the owner; small findings stop interrupting the work | None beyond stage 1 |
-| 3. The gate | Pull requests into a protected main line, the automatic checks, the independent reviewer, `AGENTS.md` | Nothing reaches the live product unreviewed | A day to set up the checks; every change now goes through a pull request |
+| 3. The gate | Pull requests into a protected main line, the automatic checks, the independent reviewer set up and proved (`references/codex-review.md`), `AGENTS.md` | Nothing reaches the live product unreviewed | A day to set up the checks; every change now goes through a pull request |
 | 4. The brief and spec-kit | Briefs, the constitution, `/speckit-specify` → `/speckit-analyze`, phases | Rules are settled before building; acceptance tests in the owner's own words | The first brief takes longest; spec-kit must be installed |
 | 5. The chain | The guard script, the chain task, check-ins | Building continues while the owner is away | Needs stages 1 to 4 first |
 
@@ -54,7 +54,7 @@ Each stage is useful by itself and safe to stop after.
 
 ## For a new project
 
-1. Installation steps 1 to 10.
+1. Installation steps 1 to 10, including the reviewer set up and proved.
 2. A first, small slice: the skeleton, the checks, sign-in. Its purpose is to walk the whole loop
    once.
 3. Then the product's slices, each from a brief.

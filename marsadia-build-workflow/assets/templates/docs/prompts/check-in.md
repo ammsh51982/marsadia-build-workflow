@@ -28,8 +28,9 @@ RULES
 (c) Marker CLEAR, phases left, no hold → fire the next session at once, with any ruling as its
     extra message; then CHECK WITHIN FIVE MINUTES that a marker commit appeared.
 (d) `phase: awaiting …` → do not fire. Do the review or the check myself (spec and plan against
-    the brief; the arithmetic; each built screen against the owner's drawing). Then fire with the
-    release, or with the precise list of what differs.
+    the brief; the arithmetic; each built screen against the owner's drawing; or, when the
+    Reviewer line reads interim, the fresh Claude reviewer of docs/REVIEWER.md section 9). Then
+    fire with the release, or with the precise list of what differs.
 (e) New findings → read them verbatim and check the class. In `plain` owner mode, Serious and
     Major are mine and Minors go to the owner as a short plain-words list; in `technical` mode
     every finding goes to him verbatim with its class. A finding whose fix changes how a user works goes
@@ -37,6 +38,11 @@ RULES
 (f) A question under "Needs the owner" → bring it to him the same way; write his answer into the
     chain task's prompt.
 (g) `slice-state: ready-for-acceptance` → tell the owner and offer the sitting.
+(h) A review requested over 30 minutes ago with no answer → run
+    `node scripts/check-codex.mjs <owner>/<repo> wait <pr> [code|security]` and follow
+    docs/REVIEWER.md sections 7 and 8. Only section 8's barriers go to the owner.
+(i) The guard stopped because the reviewer is not confirmed → set it up and prove it
+    (docs/REVIEWER.md sections 4 and 5), then fire.
 
 Tell the owner only what changed or what needs his decision. Then set the next check-in, carrying
 this state forward.

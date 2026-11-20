@@ -1,6 +1,6 @@
 # Marsadia Build Workflow — the full workflow
 
-Version 1.2.2 · Created by Dr. Ahmed Hegazy — a physician bringing AI into everyday healthcare, and the founder of Marsadia.
+Version 1.3.0 · Created by Dr. Ahmed Hegazy — a physician bringing AI into everyday healthcare, and the founder of Marsadia.
 
 A workflow for building software with AI sessions when the owner decides the product and never reads code.
 It is project-neutral: replace the names in angle brackets with your own.
@@ -48,6 +48,7 @@ Some owners are engineers. Right after the workflow is installed in a project, t
 | `docs/decisions/` | One record per owner decision (`OD-…`) and per architecture decision (`ADR-…`) |
 | `docs/<slice>-SWEEP.md` | Every review finding of the slice, numbered, with its class and outcome |
 | `docs/BACKLOG.md` | Work discovered but not approved |
+| `docs/REVIEWER.md` | How the independent reviewer is set up, proved and used, and what reaches the owner when it is blocked |
 | `specs/<slice>/` | Spec-kit output: `spec.md`, `plan.md`, `research.md`, `data-model.md`, `contracts/`, `quickstart.md`, `tasks.md` |
 
 ---
@@ -123,6 +124,10 @@ Notes on the reviewer:
 - A push does not re-trigger a review. The triggers are opening the pull request, marking a draft ready, and an explicit comment.
 - A comment asking for both reviews runs only the code review; ask for the security review separately.
 - Every finding is reported verbatim (severity, file, lines, text) before anything is recorded or fixed.
+
+### Setting up and proving the reviewer
+
+When the workflow is applied to a project (in stages: with stage 3, the first stage that uses pull requests), Claude sets up Codex review in the owner's accounts — after one yes from him for those setting changes — and proves it with a real code review and a real security review on a real pull request (`scripts/check-codex.mjs`). The result is recorded as `**Reviewer:**` in `CLAUDE.md`; the session guard lets no slice be built until it is filled. Only barriers Claude cannot clear reach the owner, as one decision: get Codex working, a fresh Claude reviewer meanwhile, or no independent reviewer. The full procedure is in `docs/REVIEWER.md`.
 
 ---
 

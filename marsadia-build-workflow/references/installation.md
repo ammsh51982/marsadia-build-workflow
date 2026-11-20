@@ -15,7 +15,7 @@ steps 5 to 10 once per project. Checked against the tools' own documentation on 
 | Python 3.11 or newer and `uv` | spec-kit | `python3 --version`, `uv --version` |
 | spec-kit (`specify`) | Spec, plan, tasks, analysis | `specify version` |
 | The GitHub command tool (`gh`) | Pull requests, checks and review comments from a session | `gh --version` |
-| OpenAI Codex connected to GitHub (a ChatGPT plan that includes Codex) | The independent reviewer | A comment `@codex review` on a pull request gets a review |
+| OpenAI Codex connected to GitHub (a ChatGPT plan that includes Codex) | The independent reviewer | `node scripts/check-codex.mjs <owner/repo> look`, then the proof in `references/codex-review.md` |
 
 ## Once per computer
 
@@ -107,7 +107,7 @@ extension adds the `/speckit-git-*` skills. The names are hyphenated, not dotted
 bash ~/.claude/skills/marsadia-build-workflow/scripts/install.sh <project-folder>
 ```
 
-It adds `CLAUDE.md`, `AGENTS.md`, `docs/STATE.md`, `docs/WORKFLOW.md`, the brief, decision, sweep
+It adds `CLAUDE.md`, `AGENTS.md`, `docs/STATE.md`, `docs/WORKFLOW.md`, `docs/REVIEWER.md`, the brief, decision, sweep
 and acceptance templates, the three scheduled-task instructions under `docs/prompts/`, the
 `SessionStart` hook, the `/wrap` command, a checks skeleton and `scripts/session-guard.mjs`. It
 never overwrites a file that exists; it lists those for comparing by hand.
@@ -146,21 +146,20 @@ severities, in `AGENTS.md` (what the reviewer flags).
 
 ### 9. The independent reviewer
 
-1. Set up Codex cloud and connect it to the GitHub account.
-2. In Codex settings, turn on code review for the repository.
-3. Keep the repository's review rules in the top-level `AGENTS.md`. The template uses the heading
-   `## Review guidelines`; OpenAI's documentation has also shown `## Code Review Rules` — check the
-   current page before the first pull request: <https://developers.openai.com/codex/integrations/github>.
-4. Test on the first pull request: comment `@codex review`, and separately `@codex security review`.
+Claude does this step itself when it applies the workflow, and proves it with a real review:
+`references/codex-review.md` (in the project, `docs/REVIEWER.md`). In short:
 
-What was measured in practice, and the workflow relies on:
+1. Look: `node scripts/check-codex.mjs <owner/repo> look` (reads only).
+2. Ask the owner once, in one line, before changing his GitHub and Codex settings.
+3. Set up in his signed-in browser: the Codex app's repository access on GitHub; Codex settings →
+   the repository → Review code → Automatic review; a Codex environment if Codex asks for one.
+4. Fill the review rules in `AGENTS.md`, under `## Code Review Rules`.
+5. Prove it on a real pull request: `check-codex.mjs <owner/repo> review <pr>`, then
+   `review <pr> security`. Both must come back.
+6. Record `**Reviewer:**` in `CLAUDE.md`. No slice is built before it.
 
-- A push does not start a review. Opening the pull request, marking a draft ready, and an explicit
-  comment do.
-- One comment asking for both reviews runs only the code review. Ask for the security review in a
-  comment of its own.
-- A security-review request posted by a session with extra text after it did not run; a bare
-  comment posted from the owner's own browser did. Post it bare.
+Only barriers Claude cannot clear reach the owner, as one decision (section 8 of the reviewer
+guide). Current documentation: <https://learn.chatgpt.com/docs/third-party/github>.
 
 ### 10. The scheduled tasks
 
@@ -183,6 +182,7 @@ and changes it back afterwards.
 2. `node scripts/session-guard.mjs` prints `verdict: GO`.
 3. `node scripts/session-guard.mjs --open test` then `node scripts/session-guard.mjs` prints
    `verdict: STOP (another session holds the slice)`; `--clear` returns it to GO.
-4. A draft pull request shows both checks, and `@codex review` gets an answer.
+4. A draft pull request shows both checks, and the reviewer is proved: the `**Reviewer:**` line in
+   `CLAUDE.md` is filled (`references/codex-review.md`, section 5).
 5. The first slice should be a small one — the project's skeleton and its checks — so the whole
    loop is walked once before anything important depends on it.

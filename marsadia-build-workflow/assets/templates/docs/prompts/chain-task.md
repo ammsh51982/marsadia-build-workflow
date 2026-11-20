@@ -36,7 +36,9 @@ SETUP (every firing)
    last commit time and any job in progress; if the last commit is under ninety minutes old or a
    job is running, STOP in one line — unless the extra message says the advisor chat verified that
    session has ended. If "Needs the owner" holds a question that no ruling below answers, STOP in
-   one line; a question this prompt answers is not a stop — record the answer and go on.
+   one line; a question this prompt answers is not a stop — record the answer and go on. If the
+   guard stops because the reviewer is not confirmed, STOP in one line: the advisor chat sets it
+   up (docs/REVIEWER.md).
 
 OWNER RULINGS AND FACTS (the advisor chat keeps this true; apply before anything else)
 - <what is merged, live and recorded>
@@ -60,7 +62,8 @@ the constitution and the brief exactly. Write the marker with the guard script, 
 at once. Prove each migration on a stand-in database, then on the disposable CI database, then
 apply it to the hosted development environment. At the push that closes a phase, or a push
 carrying a migration that touches grants, policies or auth, post ONE comment on the pull request:
-`@codex review` — nothing else. When a review returns, record every finding verbatim on the sweep
+`@codex review` — nothing else. (When CLAUDE.md's Reviewer line reads `interim — fresh Claude
+reviewer`, post nothing: set `phase: awaiting the advisor chat's review` and wrap.) When a review returns, record every finding verbatim on the sweep
 before anything is fixed, and class each Serious / Major / Minor: Serious fixed before anything
 else; Major once per slice in the close bundle; Minor queued and listed in plain words under "For
 the owner". Reply on every thread in one sentence. Continue into the next phase only with ample

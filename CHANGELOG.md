@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.3.0 — 20 November 2026
+
+- **The reviewer, set up and proved.** When the workflow is applied to a project (in stages: with
+  stage 3), Claude sets up Codex review in the owner's accounts after one yes for those settings,
+  and proves it with a real code review and a real security review on a real pull request. The
+  result is recorded as `**Reviewer:**` in `CLAUDE.md`.
+- New `references/codex-review.md` (copied into projects as `docs/REVIEWER.md`): what Codex review
+  gives, what it needs, setup, proof, use, what to do when a review does not come, and the one
+  decision that reaches the owner when Codex cannot be used — get Codex working, a fresh Claude
+  reviewer meanwhile, or no reviewer.
+- New `scripts/check-codex.mjs`: `look` (read only), `review` (posts a bare request and waits) and
+  `wait`; it recognises Codex's answers, its start signal and its "create an environment" barrier.
+- The session guard stops any building while the reviewer is not yet confirmed; opening a slice may
+  go ahead.
+- `AGENTS.md` template: the review rules now sit under `## Code Review Rules`, as Codex's current
+  documentation names the section.
+
 ## 1.2.2 — 18 November 2026
 
 - The terms of use stated, on the author's decision: anyone may install the skill and use the

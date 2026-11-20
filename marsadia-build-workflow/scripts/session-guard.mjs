@@ -16,6 +16,9 @@
  *   phase:       the `phase:` line — the open phase, its model, or the hold that stands
  *   needs-owner: yes | no       whether "## Needs the owner" holds anything but "none"
  *   hold:        yes | no       whether the `phase:` line begins with "awaiting"
+ *   reviewer:    confirmed | interim | none | not yet confirmed | not stated
+ *                read from the `**Reviewer:**` line of CLAUDE.md; "not yet confirmed" stops any
+ *                building (slice-state spec-and-plan or building) — opening a slice may go ahead
  *   verdict:     STOP (<reason>) | GO
  *
  * Exit code: 0 on GO, 2 on STOP, 1 when the state file cannot be read.
@@ -30,6 +33,7 @@
  *
  * Settings (environment variables):
  *   SESSION_GUARD_STATE        path of the state file (default docs/STATE.md beside this script's folder)
+ *   SESSION_GUARD_CLAUDE       path of the project's rules file (default CLAUDE.md at the project's root)
  *   SESSION_GUARD_STALE_HOURS  hours after which an open marker is read as stale (default 5)
  */
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -38,6 +42,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const STATE = process.env.SESSION_GUARD_STATE ?? path.join(ROOT, 'docs', 'STATE.md');
+const RULES = process.env.SESSION_GUARD_CLAUDE ?? path.join(ROOT, 'CLAUDE.md');
 const STALE_HOURS = Number(process.env.SESSION_GUARD_STALE_HOURS ?? 5);
 const STALE_MS = (Number.isFinite(STALE_HOURS) && STALE_HOURS > 0 ? STALE_HOURS : 5) * 60 * 60 * 1000;
 const MARKER = /^session-open:\s*(.*)$/m;
@@ -109,6 +114,22 @@ const needsOwner =
 // A hold: the advisor chat owes a review or a check before building goes on.
 const hold = /^awaiting\b/i.test(phase);
 
+// The reviewer, from the `**Reviewer:**` line of CLAUDE.md. A project with no such line (set up
+// before the reviewer rule) reads "not stated" and is not stopped.
+let reviewer = 'not stated';
+try {
+  const line = readFileSync(RULES, 'utf8').match(/^\*\*Reviewer:\*\*\s*(.*)$/m)?.[1]?.trim();
+  if (line) {
+    if (/^<not yet confirmed/i.test(line)) reviewer = 'not yet confirmed';
+    else if (/^interim\b/i.test(line)) reviewer = 'interim';
+    else if (/^none\b/i.test(line)) reviewer = 'none';
+    else reviewer = 'confirmed';
+  }
+} catch {
+  // no CLAUDE.md beside the state file: not stated
+}
+const building = state === 'building' || state === 'spec-and-plan';
+
 let verdict = 'GO';
 if (open) verdict = 'STOP (another session holds the slice)';
 else if (needsOwner || state === 'needs-owner')
@@ -117,11 +138,14 @@ else if (state === 'ready-for-acceptance')
   verdict = 'STOP (ready for the owner\'s acceptance — nothing for a session to do)';
 else if (hold && !released)
   verdict = `STOP (a hold stands: ${phase} — released only by the advisor chat)`;
+else if (reviewer === 'not yet confirmed' && building)
+  verdict = 'STOP (the reviewer is not yet confirmed — no slice is built before it; see docs/REVIEWER.md)';
 
 console.log(`marker: ${markerLine}`);
 console.log(`state: ${state}`);
 console.log(`phase: ${phase}`);
 console.log(`needs-owner: ${needsOwner ? 'yes' : 'no'}`);
 console.log(`hold: ${hold ? 'yes' : 'no'}`);
+console.log(`reviewer: ${reviewer}`);
 console.log(`verdict: ${verdict}`);
 process.exit(verdict === 'GO' ? 0 : 2);

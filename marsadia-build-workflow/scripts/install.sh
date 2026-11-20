@@ -85,6 +85,10 @@ copy_one "$SKILL_DIR/scripts/session-guard.mjs" "scripts/session-guard.mjs"
 # A copy of the workflow itself, so every session can read it without the skill.
 copy_one "$SKILL_DIR/references/workflow.md" "docs/WORKFLOW.md"
 
+# The reviewer: how Codex review is set up, proved and used, and the check that proves it.
+copy_one "$SKILL_DIR/references/codex-review.md" "docs/REVIEWER.md"
+copy_one "$SKILL_DIR/scripts/check-codex.mjs" "scripts/check-codex.mjs"
+
 echo
 echo "Marsadia Build Workflow — files placed in: $TARGET"
 echo
@@ -157,3 +161,4 @@ echo "  2. If spec-kit is not in the project yet:  specify init --here --force -
 echo "  3. Write the project's rules:  /speckit-constitution  (start from docs/constitution-additions.md)"
 echo "  4. Check the guard:  node scripts/session-guard.mjs"
 echo "  5. Continue with references/installation.md (GitHub, the reviewer, the scheduled tasks)."
+echo "  6. The reviewer: Claude sets up and proves Codex review (docs/REVIEWER.md); no slice is built before it."

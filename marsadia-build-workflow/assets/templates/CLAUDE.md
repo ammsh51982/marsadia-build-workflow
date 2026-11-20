@@ -7,6 +7,8 @@ The owner decides the product.
 
 **Session mode:** <not yet answered — ask the owner the second question in docs/WORKFLOW.md ("How sessions follow each other"): scheduled or continuous; unanswered means continuous>
 
+**Reviewer:** <not yet confirmed — Claude sets up and proves Codex review (docs/REVIEWER.md) before the first slice is built>
+
 This project follows the **Marsadia Build Workflow** (`docs/WORKFLOW.md`).
 
 ## Read this first, every session
@@ -46,6 +48,10 @@ One slice at a time.
    fixed, then classed **Serious / Major / Minor** (below).
 10. The owner runs the acceptance test from the brief and approves.
 11. Merge on the owner's word, deploy, the post-merge record, `/wrap`.
+
+The reviewer is set up and proved before the first slice is built: the **Reviewer** line at the
+top of this file (`docs/REVIEWER.md`). If it reads `interim — fresh Claude reviewer`, a phase closes
+with `phase: awaiting the advisor chat's review` instead of `@codex review`.
 
 Never start a slice without an approved brief. Never expand scope mid-slice: record discovered
 work in `docs/BACKLOG.md` and raise it.
@@ -114,8 +120,10 @@ docs/decisions/         owner decisions (OD-…) and architecture decisions (ADR
 docs/<slice>-SWEEP.md   the slice's review findings
 docs/BACKLOG.md         discovered work, not yet approved
 docs/prompts/           the standing instructions of the scheduled tasks
+docs/REVIEWER.md        the reviewer: setup, proof, use, barriers
 specs/                  spec-kit output per slice
 scripts/session-guard.mjs
+scripts/check-codex.mjs  proves that Codex review answers on this repository
 ```
 
 ## Stack and commands

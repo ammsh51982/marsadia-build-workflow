@@ -1,6 +1,6 @@
 # Marsadia Build Workflow
 
-Version 1.2.2
+Version 1.3.0
 
 *Created by Dr. Ahmed Hegazy — a physician bringing AI into everyday healthcare, and the founder of Marsadia.*
 
@@ -13,7 +13,7 @@ brief  →  spec, plan, tasks (spec-kit)  →  plan review  →  phased build by
        →  code review per phase  →  the owner's acceptance  →  security review  →  merge  →  record
 ```
 
-## Two questions after installing
+## After installing
 
 Right after the workflow is installed in a project, the owner is asked two questions and answers each
 with one word.
@@ -34,6 +34,11 @@ with one word.
 The answers are kept in the project's `CLAUDE.md` as `Owner mode:` and `Session mode:` and can be
 changed at any time with the same word.
 
+**Then the independent reviewer.** Claude sets up Codex review for the project in the owner's accounts
+(after one yes for those settings) and proves it with a real code review and a real security review.
+No slice is built before it. Only what Claude cannot clear — for example a plan without Codex — reaches
+the owner, as one decision: get Codex working, a fresh Claude reviewer meanwhile, or no reviewer.
+
 ## What is in this repository
 
 | Path | What it is |
@@ -42,9 +47,11 @@ changed at any time with the same word.
 | `marsadia-build-workflow/references/workflow.md` | The workflow in full |
 | `marsadia-build-workflow/references/installation.md` | Everything to install, step by step |
 | `marsadia-build-workflow/references/adopting.md` | Applying it to a new or an existing project, whole or in stages |
+| `marsadia-build-workflow/references/codex-review.md` | The independent reviewer: setting up Codex review, proving it works, using it, and what reaches the owner when it is blocked |
 | `marsadia-build-workflow/assets/templates/` | The files a project needs: `CLAUDE.md`, `AGENTS.md`, the state file, the brief, the decision record, the findings list, the acceptance sheet, the session hook, `/wrap`, a checks skeleton, and the instructions for the three scheduled tasks |
 | `marsadia-build-workflow/scripts/session-guard.mjs` | The guard every chained session runs first |
 | `marsadia-build-workflow/scripts/install.sh` | Places the templates in a project without overwriting anything |
+| `marsadia-build-workflow/scripts/check-codex.mjs` | Proves that Codex review answers on a repository |
 | `CHANGELOG.md` | What changed in each version |
 
 ## Install
