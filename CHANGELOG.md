@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.4.0 — 20 November 2026
+
+- **How deep each review goes, picked automatically.** Claude gives every review a depth from what
+  the phase touches — Light, Standard, Deep, Deepest — and records it on the sweep. The owner is
+  never asked.
+- On GitHub, OpenAI chooses Codex's model and effort and offers no setting, so the depth steers
+  what Codex looks at: a focus line naming the risky part for Deep phases.
+- Where the Codex command tool is already signed in, Claude adds a second review with the effort
+  set by the depth (`high` for Deep; `xhigh`, or `max` where offered, for Deepest), leaving the model
+  on Codex's default. The owner's sign-in is never placed in a cloud session.
+- `check-codex.mjs review` takes `--focus "<text>"` for a Deep code review.
+- New section 10 of the reviewer guide.
+
 ## 1.3.0 — 20 November 2026
 
 - **The reviewer, set up and proved.** When the workflow is applied to a project (in stages: with

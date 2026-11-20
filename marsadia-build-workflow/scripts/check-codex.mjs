@@ -5,9 +5,10 @@
  *   node scripts/check-codex.mjs <owner/repo> look
  *       Read only. Reports Codex's latest activity on the repository's recent pull requests.
  *
- *   node scripts/check-codex.mjs <owner/repo> review <pr> [code|security] [--minutes <n>]
- *       Posts a bare "@codex review" (or "@codex security review") comment on the open pull
- *       request <pr>, from the GitHub account `gh` is signed in as, then waits for Codex.
+ *   node scripts/check-codex.mjs <owner/repo> review <pr> [code|security] [--focus "<text>"] [--minutes <n>]
+ *       Posts "@codex review" (or a bare "@codex security review") on the open pull request
+ *       <pr>, from the GitHub account `gh` is signed in as, then waits for Codex. --focus adds
+ *       the risky part for a Deep review: "@codex review for <text>" (code review only).
  *
  *   node scripts/check-codex.mjs <owner/repo> wait <pr> [code|security] [--since <time>] [--minutes <n>]
  *       Read only. Waits for Codex's answer to the latest request of that kind on <pr>, or to
@@ -35,7 +36,7 @@ const START_MINUTES = 10;
 
 const USAGE = `usage:
   node check-codex.mjs <owner/repo> look
-  node check-codex.mjs <owner/repo> review <pr> [code|security] [--minutes <n>]
+  node check-codex.mjs <owner/repo> review <pr> [code|security] [--focus "<text>"] [--minutes <n>]
   node check-codex.mjs <owner/repo> wait <pr> [code|security] [--since <time>] [--minutes <n>]`;
 
 function fail(message, code = 1) {
@@ -50,6 +51,7 @@ if (!repo || !/^[\w.-]+\/[\w.-]+$/.test(repo) || !['look', 'review', 'wait'].inc
 
 let minutes = 30;
 let since = null;
+let focus = null;
 const words = [];
 for (let i = 0; i < rest.length; i += 1) {
   if (rest[i] === '--minutes') {
@@ -58,6 +60,9 @@ for (let i = 0; i < rest.length; i += 1) {
   } else if (rest[i] === '--since') {
     i += 1;
     since = rest[i] ?? '';
+  } else if (rest[i] === '--focus') {
+    i += 1;
+    focus = (rest[i] ?? '').trim();
   } else {
     words.push(rest[i]);
   }
@@ -66,6 +71,11 @@ if (!Number.isFinite(minutes) || minutes <= 0) fail('--minutes takes a positive 
 if (since !== null && Number.isNaN(Date.parse(since))) fail(`--since is not a time: ${since}`);
 const [pr, kind = 'code'] = words;
 if (!['code', 'security'].includes(kind)) fail(`the kind of review is code or security, not: ${kind}`);
+if (focus !== null) {
+  if (mode !== 'review' || kind !== 'code') fail('--focus is for a code review in review mode only; the security review is posted bare');
+  if (!focus) fail('--focus needs the risky part in a few words');
+  focus = focus.replace(/^for\s+/i, '');
+}
 
 // ---------------------------------------------------------------------------
 // GitHub, through the `gh` command tool (it carries the sign-in).
@@ -255,7 +265,7 @@ if (mode === 'review') {
   if (pull.state !== 'open') {
     fail(`pull request #${pr} is ${pull.merged_at ? 'merged' : 'closed'}; Codex reviews open pull requests — use an open one`);
   }
-  const body = kind === 'security' ? '@codex security review' : '@codex review';
+  const body = kind === 'security' ? '@codex security review' : focus ? `@codex review for ${focus}` : '@codex review';
   if (process.env.DRY_RUN === '1') {
     console.log(`dry run — would post on #${pr} of ${repo}: ${body}`);
     process.exit(0);

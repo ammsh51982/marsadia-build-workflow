@@ -1,6 +1,6 @@
 # Marsadia Build Workflow
 
-Version 1.3.0
+Version 1.4.0
 
 *Created by Dr. Ahmed Hegazy — a physician bringing AI into everyday healthcare, and the founder of Marsadia.*
 
@@ -38,6 +38,8 @@ changed at any time with the same word.
 (after one yes for those settings) and proves it with a real code review and a real security review.
 No slice is built before it. Only what Claude cannot clear — for example a plan without Codex — reaches
 the owner, as one decision: get Codex working, a fresh Claude reviewer meanwhile, or no reviewer.
+How deep each review goes is picked by Claude automatically from what the work touches: more for
+migrations, permissions, money and personal data, less for ordinary screens, none for wording.
 
 ## What is in this repository
 

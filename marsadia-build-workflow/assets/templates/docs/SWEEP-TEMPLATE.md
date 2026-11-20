@@ -7,7 +7,8 @@ finding has one number across the whole project.
 Each finding opens with a `**Status:**` line — `open`, `resolved` or `unverified` — and it is the
 only place the status is recorded. Each carries the reviewer's severity and our class.
 
-**Review requests of this slice** (listed as they are made): none yet.
+**Review requests of this slice** (listed as they are made, each with its depth — Light, Standard,
+Deep or Deepest — and whether the command-tool pass ran): none yet.
 
 ---
 

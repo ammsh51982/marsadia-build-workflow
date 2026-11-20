@@ -1,6 +1,6 @@
 # Marsadia Build Workflow — the full workflow
 
-Version 1.3.0 · Created by Dr. Ahmed Hegazy — a physician bringing AI into everyday healthcare, and the founder of Marsadia.
+Version 1.4.0 · Created by Dr. Ahmed Hegazy — a physician bringing AI into everyday healthcare, and the founder of Marsadia.
 
 A workflow for building software with AI sessions when the owner decides the product and never reads code.
 It is project-neutral: replace the names in angle brackets with your own.
@@ -128,6 +128,8 @@ Notes on the reviewer:
 ### Setting up and proving the reviewer
 
 When the workflow is applied to a project (in stages: with stage 3, the first stage that uses pull requests), Claude sets up Codex review in the owner's accounts — after one yes from him for those setting changes — and proves it with a real code review and a real security review on a real pull request (`scripts/check-codex.mjs`). The result is recorded as `**Reviewer:**` in `CLAUDE.md`; the session guard lets no slice be built until it is filled. Only barriers Claude cannot clear reach the owner, as one decision: get Codex working, a fresh Claude reviewer meanwhile, or no independent reviewer. The full procedure is in `docs/REVIEWER.md`.
+
+Each review's depth (Light, Standard, Deep, Deepest) is picked by Claude from what the phase touches, and the effort follows it where Claude can set it; see section 10 of `docs/REVIEWER.md`.
 
 ---
 

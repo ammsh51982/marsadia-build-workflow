@@ -1,6 +1,6 @@
 # The reviewer — Codex review
 
-Part of the Marsadia Build Workflow, version 1.3.0. In each project this file is copied to
+Part of the Marsadia Build Workflow, version 1.4.0. In each project this file is copied to
 `docs/REVIEWER.md`.
 
 Codex, OpenAI's coding agent, reviews the work on every pull request. It is the workflow's
@@ -10,7 +10,7 @@ how it is used, and what reaches the owner when something blocks it.
 
 Contents: 1 What it gives · 2 When it is set up · 3 What it needs · 4 Setting it up ·
 5 Proving it works · 6 Using it · 7 When a review does not come · 8 What goes to the owner ·
-9 The fresh Claude reviewer
+9 The fresh Claude reviewer · 10 Model, effort and how deep each review goes
 
 ## 1. What Codex review gives
 
@@ -166,3 +166,40 @@ Recommend A. If he defers, B runs until Codex works, recorded in `CLAUDE.md` as
   the hold.
 - Each time, the advisor chat checks whether Codex now works (`look`, then section 5), and
   switches back as soon as it does.
+
+## 10. Model, effort and how deep each review goes
+
+**On GitHub, OpenAI chooses the model and the effort.** Codex's GitHub documentation names no
+model, and there is no setting for model or effort: not in Codex settings, not per repository, not
+in the comment. When OpenAI introduced its review model it said the model adjusts how long it
+thinks to the size and difficulty of the change, so on GitHub "more for complex, less for simple"
+happens inside Codex. What Claude controls there is what Codex looks at: the focus line in the
+request and the rules in `AGENTS.md`.
+
+**With the Codex command tool, Claude chooses the effort** (and, when needed, the model):
+
+```
+codex review --base <main branch> -c model_reasoning_effort="high"
+```
+
+The levels a model offers vary (for example low, medium, high, xhigh, max); use the highest the
+depth below asks for that the model offers. Leave the model on Codex's own default, because model
+names change every few months. Name a stronger model with `-m <model>` only after checking that the
+owner's account offers it. `--base`, `--commit`, `--uncommitted` and a custom prompt cannot be
+combined, so this pass takes its guidance from `AGENTS.md`, not from a focus line.
+
+**Claude picks the depth of every review itself**, from what the phase touches, and writes the
+depth beside the request in the slice's sweep. The owner is never asked.
+
+| Depth | The phase touches | On GitHub | With the command tool |
+| --- | --- | --- | --- |
+| Light | Only wording, documents or records | No review requested; the automatic checks only | Not run |
+| Standard | Ordinary screens and logic | `@codex review` | Not run |
+| Deep | A migration, permissions, sign-in, money, personal data, keeping customers' data apart, or many files at once | `@codex review for <the risky part, named in a few words>` | Effort `high` |
+| Deepest | The slice's close, or a phase where one mistake would expose one customer's data to another or let someone act without permission | The slice's security review at the close, as section 6 says | Effort `xhigh`, or `max` where the model offers it |
+
+The command-tool pass runs only where Codex is already signed in on that machine: a session on the
+owner's computer, or the advisor chat through a shell on his computer. The owner's sign-in is never
+placed in a cloud session, because sessions hold no secrets. Where the pass cannot run, the GitHub
+review stands alone and the sweep says so. Its findings are recorded verbatim and classed exactly
+like the GitHub review's.

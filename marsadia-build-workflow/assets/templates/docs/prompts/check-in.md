@@ -43,6 +43,10 @@ RULES
     docs/REVIEWER.md sections 7 and 8. Only section 8's barriers go to the owner.
 (i) The guard stopped because the reviewer is not confirmed → set it up and prove it
     (docs/REVIEWER.md sections 4 and 5), then fire.
+(j) A Deep or Deepest phase has closed → if the Codex command tool is signed in where I can run
+    it (a shell on the owner's computer), run its review at the depth's effort
+    (docs/REVIEWER.md section 10) and record the findings like Codex's; otherwise note on the
+    sweep that the GitHub review stood alone.
 
 Tell the owner only what changed or what needs his decision. Then set the next check-in, carrying
 this state forward.

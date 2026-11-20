@@ -10,7 +10,7 @@ description: The owner's default way of building software with Claude — an own
 *All rights reserved. You may install the skill and use the workflow on your own projects without
 asking; please ask before sharing a copy or publishing a changed version: marsadia.co@gmail.com*
 
-Version 1.3.0 · Templates, scripts and the full text live in the repository
+Version 1.4.0 · Templates, scripts and the full text live in the repository
 `ammsh51982/marsadia-build-workflow`. When that repository can be attached or is installed
 beside this file, read its `references/` and use its `assets/templates/` and `scripts/`. When it
 cannot be reached, this file alone is enough to run the workflow.
@@ -181,6 +181,15 @@ needs a permission he does not hold, Codex is still silent after the checks — 
 his setting's form: **A** get Codex working (recommended), **B** a fresh Claude session that took
 no part in the build reviews each phase meanwhile, **C** no independent reviewer. If he defers,
 B runs until Codex works.
+
+**How deep each review goes is Claude's choice, made automatically.** On GitHub, OpenAI picks
+Codex's model and effort and offers no setting; Claude steers what Codex looks at. It picks a
+depth from what the phase touches: **Light** (wording, records: no review), **Standard**
+(`@codex review`), **Deep** (migrations, permissions, sign-in, money, personal data:
+`@codex review for <the risky part>`, plus a command-tool review at effort `high`), **Deepest**
+(the slice's close, or a phase that could expose one customer's data to another: effort `xhigh` or
+`max`). The command-tool pass runs only where Codex is already signed in; the owner's sign-in never
+goes into a cloud session. Details: section 10 of the reviewer guide.
 
 ## What happens to a finding
 
